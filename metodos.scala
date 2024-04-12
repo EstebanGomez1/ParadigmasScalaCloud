@@ -1,5 +1,5 @@
-package ops {
-  class Operaciones (a: Int, b: Int){
+package aux{
+  class metodos (a: Int, b: Int){
     def suma(): Int = {
       return a + b
     }
