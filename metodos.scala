@@ -1,8 +1,8 @@
 package aux{
-  class metodos (a: Int, b: Int){
-    def suma(): Int = {
-      return a + b
+  class metodos {
+    def llenarLista(dimension: Int): List[String] = dimension match {
+      case 0 => Nil
+      case _ => " "::llenarLista(dimension-1)
     }
-    def resta(): Int = a - b
-  }
+
 }
