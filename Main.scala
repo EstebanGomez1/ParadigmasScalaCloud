@@ -1,3 +1,5 @@
+import java.util.Random
+import scala.math._
 
 object Constants {
   val vacio: Int = 0
@@ -12,9 +14,10 @@ object Constants {
 }
 
 object Main {
-  import Auxiliar.Metodos
-  import scala.io.StdIn
   import Constants._
+  import auxiliar.Metodos
+
+  import scala.io.StdIn
 
   // Pedir datos al usuario
   def obtenerDimensionesMatriz(): (Int, Int) = {
@@ -25,10 +28,9 @@ object Main {
 
       // Pedir al usuario que introduzca el valor de la columna
       print("Introduce el numero de columnas: ")
-      val columna = StdIn.readInt()
-
+      val col = StdIn.readInt()
       // Return dimensiones
-      (fila, columna)
+      (fila, col)
     } catch {
       case e: NumberFormatException => {
         println("Error: Debes introducir un número válido.")
@@ -120,7 +122,7 @@ object Main {
   def randomFunction(): Int = {
     val random = new Random()
     val randomNumber = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
-    if (randomNumber < 0.5) 5 else 0
+    if (randomNumber < 0.5) 2 else 0
   }
 
   def listaBloques(col:Int):List[Int] =
@@ -129,32 +131,22 @@ object Main {
       case _ => randomFunction()::listaBloques(col-1)
     }
 
-  val listanueva = listaBloques(col)
-  println("Lista Bloques: ")
-  println(listanueva)
-
   def revisar(col:Int, lista:List[Int], long:Int):List[Int] =
     lista match{
       case Nil => Nil
       case l if long>=3 => 0::revisar(col-1,lista.tail, long-3)
-      case l if lista.head==5 => lista.head::revisar(col-1, lista.tail, long+1)
+      case l if lista.head==2 => lista.head::revisar(col-1, lista.tail, long+1)
       case _ => lista.head::revisar(col-1, lista.tail, long=0)
     }
-
-  val revisada = revisar(col, listanueva, 0)
-  println("Lista revisada: ")
-  println(revisada)
 
 
   def modificacion(lista:List[Int], lBlq:List[Int], fila:Int, col:Int, dimension:Int):List[Int] =
     dimension match{
       case 0 => Nil
-      case d if d<=4*col && d>3*col => lBlq.head::modificacion(lista.tail, lBlq.tail, fila, col, dimension-1)
+      case d if d<=5*col && d>4*col => lBlq.head::modificacion(lista.tail, lBlq.tail, fila, col, dimension-1)
       case _ =>  lista.head::modificacion(lista.tail, lBlq, fila, col, dimension-1)
     }
-  val tablanueva =modificacion(tablero(fila, col, dimension), revisada, fila, col, dimension)
-  println("Tablero nuevo revisado: ")
-  println(tablanueva)
+
   // Reconversion de naves
 
   // Descenso de naves
@@ -167,6 +159,7 @@ object Main {
 
     // Obtener las dimensiones del escenario
     val (numFilas, numColumnas) = obtenerDimensionesMatriz()
+    val dimension = numFilas*numColumnas
     println(s"Dimensiones del Escenario: $numFilas x $numColumnas")
     val escenario = metodos.InicializarLista(numFilas*numColumnas)
 
@@ -182,8 +175,19 @@ object Main {
       6, 0, 0, 0, 7,
       0, 8, 0, 9, 0
     )*/
+
+    val listanueva = listaBloques(numColumnas)
+    println("Lista Bloques: ")
+    println(listanueva)
+
+    val revisada = revisar(numColumnas, listanueva, 0)
+    println("Lista revisada: ")
+    println(revisada)
+
+    val tablanueva =modificacion(tablero(numFilas, numColumnas, dimension), revisada, numFilas, numColumnas, dimension)
+    println("Tablero nuevo revisado: ")
+    println(tablanueva)
+
     imprimirEscenario(tablanueva, numFilas, numColumnas, puntuacion, vidas)
   }
-
-
 }
