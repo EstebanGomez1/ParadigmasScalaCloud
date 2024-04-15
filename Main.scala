@@ -15,9 +15,10 @@ object Constants {
 
 object Main {
   import Constants._
-  import auxiliar.Metodos
-
+  import Auxiliar.Metodos
   import scala.io.StdIn
+
+  val metodos:  Metodos = new Metodos
 
   // Pedir datos al usuario
   def obtenerDimensionesMatriz(): (Int, Int) = {
@@ -110,25 +111,10 @@ object Main {
   }
 
   //Muros
-  def tablero(fila:Int, col:Int, dimension:Int):List[Int] =
-    dimension match{
-      case 0 => Nil
-      //case d if d<=2 *col && d>1*col => randomFunction()::tablero(fila, col, dimension-1)
-      case d if d==((col/2)+1) => 1::tablero(fila, col, dimension-1)
-      case _ =>  0::tablero(fila, col, dimension-1)
-    }
-
-
-  def randomFunction(): Int = {
-    val random = new Random()
-    val randomNumber = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
-    if (randomNumber < 0.5) 2 else 0
-  }
-
   def listaBloques(col:Int):List[Int] =
     col match{
       case 0 => Nil
-      case _ => randomFunction()::listaBloques(col-1)
+      case _ => metodos.randomFunction()::listaBloques(col-1)
     }
 
   def revisar(col:Int, lista:List[Int], long:Int):List[Int] =
@@ -139,13 +125,20 @@ object Main {
       case _ => lista.head::revisar(col-1, lista.tail, long=0)
     }
 
-
   def modificacion(lista:List[Int], lBlq:List[Int], fila:Int, col:Int, dimension:Int):List[Int] =
     dimension match{
       case 0 => Nil
       case d if d<=5*col && d>4*col => lBlq.head::modificacion(lista.tail, lBlq.tail, fila, col, dimension-1)
       case _ =>  lista.head::modificacion(lista.tail, lBlq, fila, col, dimension-1)
     }
+
+  def generarMuros(escenario: List[Int], numFilas: Int, numColumnas: Int, dimension: Int): List[Int]= {
+    val listanueva = listaBloques(numColumnas)
+    val revisada = revisar(numColumnas, listanueva, 0)
+    val tablanueva = modificacion(escenario, revisada, numFilas, numColumnas, dimension)
+    // añadir usuario al escenario
+    return  metodos.insertarPosicion(1,((numColumnas/2)+(numFilas-1)*numColumnas), tablanueva)
+  }
 
   // Reconversion de naves
 
@@ -154,20 +147,11 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     // Paquete de metodos auxiliares
-    val metodos:  Metodos = new Metodos
     println(" - Dimensiones - ")
 
     // Obtener las dimensiones del escenario
-    val (numFilas, numColumnas) = obtenerDimensionesMatriz()
-    val dimension = numFilas*numColumnas
-    println(s"Dimensiones del Escenario: $numFilas x $numColumnas")
-    val escenario = metodos.InicializarLista(numFilas*numColumnas)
-
-    // Puntuación y vidas del usuario de prueba
-    val puntuacion: Int = 100
-    val vidas: Int = 3
-
-    // imprimir el escenario
+    val numFilas = 15
+    val numColumnas = 11
     /*val matrizPrueba: List[Int] = List(
       0, 1, 0, 2, 0,
       3, 0, 0, 0, 4,
@@ -176,18 +160,19 @@ object Main {
       0, 8, 0, 9, 0
     )*/
 
-    val listanueva = listaBloques(numColumnas)
-    println("Lista Bloques: ")
-    println(listanueva)
+    //val (numFilas, numColumnas) = obtenerDimensionesMatriz()
+    val dimension = numFilas*numColumnas
+    println(s"Dimensiones del Escenario: $numFilas x $numColumnas")
+    val escenarioVacio = metodos.InicializarLista(numFilas*numColumnas)
 
-    val revisada = revisar(numColumnas, listanueva, 0)
-    println("Lista revisada: ")
-    println(revisada)
+    // Puntuación y vidas del usuario de prueba
+    val puntuacion: Int = 100
+    val vidas: Int = 3
 
-    val tablanueva =modificacion(tablero(numFilas, numColumnas, dimension), revisada, numFilas, numColumnas, dimension)
-    println("Tablero nuevo revisado: ")
-    println(tablanueva)
+    // Generar muros y añadir usuario
+    val escenario = generarMuros(escenarioVacio, numFilas, numColumnas, dimension)
 
-    imprimirEscenario(tablanueva, numFilas, numColumnas, puntuacion, vidas)
+    // Imprimir escenario
+    imprimirEscenario(escenario, numFilas, numColumnas, puntuacion, vidas)
   }
 }
