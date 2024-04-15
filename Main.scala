@@ -150,8 +150,8 @@ object Main {
     println(" - Dimensiones - ")
 
     // Obtener las dimensiones del escenario
-    val numFilas = 15
-    val numColumnas = 11
+    val numFilas = 5
+    val numColumnas = 5
     /*val matrizPrueba: List[Int] = List(
       0, 1, 0, 2, 0,
       3, 0, 0, 0, 4,
@@ -170,9 +170,54 @@ object Main {
     val vidas: Int = 3
 
     // Generar muros y añadir usuario
-    val escenario = generarMuros(escenarioVacio, numFilas, numColumnas, dimension)
+    val escenarioInicial = generarMuros(escenarioVacio, numFilas, numColumnas, dimension)
 
     // Imprimir escenario
-    imprimirEscenario(escenario, numFilas, numColumnas, puntuacion, vidas)
+    imprimirEscenario(escenarioInicial, numFilas, numColumnas, puntuacion, vidas)
+
+    // Movimiento y ejecucion del juego
+    def movimiento(posicion: Int, escenario: List[Int]): Unit = {
+        println(" mover jugador: ")
+        val entrada = StdIn.readChar() // entrada de teclado para el movimiento
+        entrada match {
+          case 'a' => {
+            if (posicion-1 > (numColumnas*numFilas - 1) || posicion-1 < numColumnas*(numFilas-1)) {
+              println("Movimiento no válido")
+              movimiento(posicion, escenario)
+            } else {
+              println("mover izq")
+              // actualizar posicion usuario
+              val escenarioAux = metodos.insertarPosicion(0,posicion,escenario)
+              val escenarioNuevo = metodos.insertarPosicion(1,posicion-1, escenarioAux)
+              //actualizarEscenario
+              imprimirEscenario(escenarioNuevo, numFilas, numColumnas, puntuacion, vidas)
+              movimiento(posicion-1, escenarioNuevo)
+            }
+          }
+          case 'd' => {
+            if (posicion+1 > (numColumnas*numFilas - 1) || posicion+1 < numColumnas*(numFilas-1)) {
+              println("Movimiento no válido")
+              movimiento(posicion, escenario)
+            } else {
+              println("mover der")
+              //actualizarEscenario
+              // actualizar posicion usuario
+              val escenarioAux = metodos.insertarPosicion(0,posicion,escenario)
+              val escenarioNuevo = metodos.insertarPosicion(1,posicion+1, escenarioAux)
+              //actualizarEscenario
+              imprimirEscenario(escenarioNuevo, numFilas, numColumnas, puntuacion, vidas)
+              movimiento(posicion+1, escenarioNuevo)
+            }
+          }
+          case _   => {
+            println("Movimiento no válido")
+            movimiento(posicion, escenario)
+          }
+        }
+    }
+    // ejecutar el movimiento
+    val pos = ((numColumnas/2)+(numFilas-1)*numColumnas)
+    movimiento(pos, escenarioInicial)
+
   }
 }
