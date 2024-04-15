@@ -26,12 +26,23 @@ object Main {
       // Pedir al usuario que introduzca el valor de la fila
       print("Introduce el numero de filas: ")
       val fila = StdIn.readInt()
-
-      // Pedir al usuario que introduzca el valor de la columna
-      print("Introduce el numero de columnas: ")
-      val col = StdIn.readInt()
-      // Return dimensiones
-      (fila, col)
+      if ( fila < 15){
+        println("Dimension no valida")
+        obtenerDimensionesMatriz()
+      }
+      else
+        {
+          // Pedir al usuario que introduzca el valor de la columna
+          print("Introduce el numero de columnas: ")
+          val col = StdIn.readInt()
+          if ( col < 10){
+            println("Dimension no valida")
+            obtenerDimensionesMatriz()
+          }else{
+            // Return dimensiones
+            (fila, col)
+          }
+        }
     } catch {
       case e: NumberFormatException => {
         println("Error: Debes introducir un número válido.")
@@ -154,8 +165,8 @@ object Main {
     println(" - Dimensiones - ")
 
     // Obtener las dimensiones del escenario
-    val numFilas = 5
-    val numColumnas = 5
+    val numFilas = 15
+    val numColumnas = 11
     /*val matrizPrueba: List[Int] = List(
       0, 1, 0, 2, 0,
       3, 0, 0, 0, 4,
@@ -190,8 +201,8 @@ object Main {
               movimiento(posicion, escenario)
             } else {
               // actualizar posicion usuario
-              val escenarioAux = metodos.insertarPosicion(0,posicion,escenario)
-              val escenarioNuevo = metodos.insertarPosicion(1,posicion-1, escenarioAux)
+              val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
+              val escenarioNuevo = metodos.insertarPosicion(1,posicion-1, escenarioAux) // la nueva posicion contiene al jugador
               // actualizarEscenario
               //reconversionNaves
               //descensoNaves
@@ -207,8 +218,8 @@ object Main {
               movimiento(posicion, escenario)
             } else {
               // actualizar posicion usuario
-              val escenarioAux = metodos.insertarPosicion(0,posicion,escenario)
-              val escenarioNuevo = metodos.insertarPosicion(1,posicion+1, escenarioAux)
+              val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
+              val escenarioNuevo = metodos.insertarPosicion(1,posicion+1, escenarioAux) // la nueva posicion contiene al jugador
               // actualizarEscenario
               //reconversionNaves
               //descensoNaves
