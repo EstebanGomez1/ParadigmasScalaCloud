@@ -107,6 +107,54 @@ object Main {
     println(s"\n  < Puntuacion: $puntuacion > < vidas: $vidas >")
   }
 
+  //Muros
+  def tablero(fila:Int, col:Int, dimension:Int):List[Int] =
+    dimension match{
+      case 0 => Nil
+      //case d if d<=2 *col && d>1*col => randomFunction()::tablero(fila, col, dimension-1)
+      case d if d==((col/2)+1) => 1::tablero(fila, col, dimension-1)
+      case _ =>  0::tablero(fila, col, dimension-1)
+    }
+
+
+  def randomFunction(): Int = {
+    val random = new Random()
+    val randomNumber = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
+    if (randomNumber < 0.5) 5 else 0
+  }
+
+  def listaBloques(col:Int):List[Int] =
+    col match{
+      case 0 => Nil
+      case _ => randomFunction()::listaBloques(col-1)
+    }
+
+  val listanueva = listaBloques(col)
+  println("Lista Bloques: ")
+  println(listanueva)
+
+  def revisar(col:Int, lista:List[Int], long:Int):List[Int] =
+    lista match{
+      case Nil => Nil
+      case l if long>=3 => 0::revisar(col-1,lista.tail, long-3)
+      case l if lista.head==5 => lista.head::revisar(col-1, lista.tail, long+1)
+      case _ => lista.head::revisar(col-1, lista.tail, long=0)
+    }
+
+  val revisada = revisar(col, listanueva, 0)
+  println("Lista revisada: ")
+  println(revisada)
+
+
+  def modificacion(lista:List[Int], lBlq:List[Int], fila:Int, col:Int, dimension:Int):List[Int] =
+    dimension match{
+      case 0 => Nil
+      case d if d<=4*col && d>3*col => lBlq.head::modificacion(lista.tail, lBlq.tail, fila, col, dimension-1)
+      case _ =>  lista.head::modificacion(lista.tail, lBlq, fila, col, dimension-1)
+    }
+  val tablanueva =modificacion(tablero(fila, col, dimension), revisada, fila, col, dimension)
+  println("Tablero nuevo revisado: ")
+  println(tablanueva)
   // Reconversion de naves
 
   // Descenso de naves
@@ -127,37 +175,15 @@ object Main {
     val vidas: Int = 3
 
     // imprimir el escenario
-    val matrizPrueba: List[Int] = List(
+    /*val matrizPrueba: List[Int] = List(
       0, 1, 0, 2, 0,
       3, 0, 0, 0, 4,
       0, 0, 5, 0, 0,
       6, 0, 0, 0, 7,
       0, 8, 0, 9, 0
-    )
-    imprimirEscenario(matrizPrueba, numFilas, numColumnas, puntuacion, vidas)
+    )*/
+    imprimirEscenario(tablanueva, numFilas, numColumnas, puntuacion, vidas)
   }
 
-  /*def tablero(fila:Int, col:Int, dimension:Int):List[Int] =
-    dimension match{
-      case 0 => Nil
-      case d if d<=2 *col && d>1*col => randomFunction()::tablero(fila, col, dimension-1)
-      case d if d==((col/2)+1) => 1::tablero(fila, col, dimension-1)
-      case _ =>  0::tablero(fila, col, dimension-1)
-    }
 
-
-def randomFunction(): Int = {
-  val random = new Random()
-  val randomNumber = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
-  if (randomNumber < 0.5) 5 else 0
-}
-
-def modificacion(lista:List[Int], fila:Int, col:Int, dimension:Int):List[Int] =
-    dimension match{
-      case 0 => Nil
-      case d if d<=3*col && d>2*col => lista.head::modificacion(lista.tail, fila, col, dimension-1)
-      case _ =>  lista.head::modificacion(lista.tail, fila, col, dimension-1)
-}
-val tablanueva =modificacion(tablero(5, 5, dimension), fila, col, dimension)
-println(tablanueva)*/ //FALTA PROBAR MEDIANAMENTE FUNCIONA
 }
