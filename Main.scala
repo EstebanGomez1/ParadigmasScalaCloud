@@ -144,6 +144,10 @@ object Main {
 
   // Descenso de naves
 
+  // desintegracion de naves
+
+  // generacion de naves
+
 
   def main(args: Array[String]): Unit = {
     // Paquete de metodos auxiliares
@@ -185,11 +189,14 @@ object Main {
               println("Movimiento no válido")
               movimiento(posicion, escenario)
             } else {
-              println("mover izq")
               // actualizar posicion usuario
               val escenarioAux = metodos.insertarPosicion(0,posicion,escenario)
               val escenarioNuevo = metodos.insertarPosicion(1,posicion-1, escenarioAux)
-              //actualizarEscenario
+              // actualizarEscenario
+              //reconversionNaves
+              //descensoNaves
+              //desintegracionNaves
+              //generacionNaves
               imprimirEscenario(escenarioNuevo, numFilas, numColumnas, puntuacion, vidas)
               movimiento(posicion-1, escenarioNuevo)
             }
@@ -199,12 +206,14 @@ object Main {
               println("Movimiento no válido")
               movimiento(posicion, escenario)
             } else {
-              println("mover der")
-              //actualizarEscenario
               // actualizar posicion usuario
               val escenarioAux = metodos.insertarPosicion(0,posicion,escenario)
               val escenarioNuevo = metodos.insertarPosicion(1,posicion+1, escenarioAux)
-              //actualizarEscenario
+              // actualizarEscenario
+              //reconversionNaves
+              //descensoNaves
+              //desintegracionNaves
+              //generacionNaves
               imprimirEscenario(escenarioNuevo, numFilas, numColumnas, puntuacion, vidas)
               movimiento(posicion+1, escenarioNuevo)
             }
