@@ -136,4 +136,28 @@ object Main {
     )
     imprimirEscenario(matrizPrueba, numFilas, numColumnas, puntuacion, vidas)
   }
+
+  /*def tablero(fila:Int, col:Int, dimension:Int):List[Int] =
+    dimension match{
+      case 0 => Nil
+      case d if d<=2 *col && d>1*col => randomFunction()::tablero(fila, col, dimension-1)
+      case d if d==((col/2)+1) => 1::tablero(fila, col, dimension-1)
+      case _ =>  0::tablero(fila, col, dimension-1)
+    }
+
+
+def randomFunction(): Int = {
+  val random = new Random()
+  val randomNumber = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
+  if (randomNumber < 0.5) 5 else 0
+}
+
+def modificacion(lista:List[Int], fila:Int, col:Int, dimension:Int):List[Int] =
+    dimension match{
+      case 0 => Nil
+      case d if d<=3*col && d>2*col => lista.head::modificacion(lista.tail, fila, col, dimension-1)
+      case _ =>  lista.head::modificacion(lista.tail, fila, col, dimension-1)
+}
+val tablanueva =modificacion(tablero(5, 5, dimension), fila, col, dimension)
+println(tablanueva)*/ //FALTA PROBAR MEDIANAMENTE FUNCIONA
 }
