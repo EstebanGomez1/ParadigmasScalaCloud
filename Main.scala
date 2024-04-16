@@ -152,20 +152,91 @@ object Main {
   }
 
   // Reconversion de naves
+  def reconversionNaves( escenario: List[Int], numFilas :Int, numColumnas :Int):List[Int] = {
+    /*
+    @descripcion reconversionNaves: esta funcion modifica naves o conjuntos de naves en base a unas restricciones y condiciones del entorno
+    @param escenario: lista que contiene el escenario
+    @param numFilas: numero de filas del escenario
+    @param numColumnas: numero de columnas del escenario
+     */
+    val filaInicial = 0
+    val colInicial = 0
+    val posInicial = 0
+    val dimension = numFilas*numColumnas
 
-  // Descenso de naves
-  def filaAliens(col:Int):List[Int] = col match{
-    case 0 => Nil
-    case _ => metodos.randomAlien()
-  }
-  def descensoNaves(filaAliens:List[Int], matriz:List[Int], long:Int):List[Int] =
-    matriz match{
-      case Nil => Nil
-      case m if m.head==2 => 2::descensoNaves(filaAliens.tail, matriz.tail, long-1)
-      case m if long>0 => filaAliens.head::descensoNaves(filaAliens.tail, matriz.tail, long-1)
-      case _ => matriz.head::descensoNaves(filaAliens, matriz.tail, long)
+    def buscarReconversion(escenarioAux :List[Int], pos :Int, fila :Int, col: Int):List[Int] ={
+
+      def aplicarReconversion():List[Int] = {
+        if( fila > 0 && fila < (numFilas-1) && col > 0 && col < (numColumnas-1)){
+          // buscar condiciones para la reconversion
+          if( metodos.obtenerValorPosicion(pos, escenarioAux) == alien || metodos.obtenerValorPosicion(pos, escenarioAux) == nube){
+            if (metodos.obtenerValorPosicion(pos-numColumnas, escenarioAux) == alien && metodos.obtenerValorPosicion(pos+numColumnas, escenarioAux) == alien && metodos.obtenerValorPosicion(pos-1, escenarioAux) == alien && metodos.obtenerValorPosicion(pos+1, escenarioAux) == alien) {
+              println("hay una reconversion")
+              val escenarioAux1 = metodos.insertarPosicion(0, pos - numColumnas, escenarioAux)
+              val escenarioAux2 = metodos.insertarPosicion(0, pos + numColumnas, escenarioAux1)
+              val escenarioAux3 = metodos.insertarPosicion(0, pos - 1, escenarioAux2)
+              val escenarioAux4 = metodos.insertarPosicion(0, pos + 1, escenarioAux3)
+              if (metodos.obtenerValorPosicion(pos, escenarioAux4) == alien) {
+                // alienigena rodeado de alienigenas genera nube
+                return metodos.insertarPosicion(nube, pos, escenarioAux4)
+              } else {
+                // nube rodeada de alienigenas genera cefalopodo
+                return metodos.insertarPosicion(cefalopodo, pos, escenarioAux4)
+              }
+            }
+          }
+          // comandante genera nubes alrededor
+          if (metodos.obtenerValorPosicion(pos, escenarioAux) == comandante){
+            val prob = metodos.numeroAleatorio()
+            prob match {
+              case prob if prob <= 0.1 => {
+                def generarNubes( pos :Int, escenarioNubes :List[Int]):List[Int]={
+                  if(metodos.obtenerValorPosicion(pos, escenarioNubes) == vacio){
+                    return metodos.insertarPosicion(nube, pos, escenarioNubes)
+                  }else{
+                    return escenarioNubes
+                  }
+                }
+                val escenarioAux1 = generarNubes(pos-numColumnas,escenarioAux)
+                val escenarioAux2 = generarNubes(pos+numColumnas,escenarioAux1)
+                val escenarioAux3 = generarNubes(pos-1, escenarioAux2)
+                return generarNubes(pos+1, escenarioAux3)
+              }
+              case _ => escenarioAux
+            }
+          }
+        }
+        return escenarioAux
+      }
+      val escenarioNuevo = aplicarReconversion()
+      val posAux = pos+1
+      def actualizarFilas( posAux :Int, fila :Int):  Int={
+        if(posAux%numColumnas == 0){
+          return fila+1
+        }else{
+          return fila
+        }
+      }
+      val filaAux = actualizarFilas(posAux,fila)
+      def actualizarCol():Int = {
+        if(col+1 >numColumnas-1){
+          return 0
+        }else{
+          return col+1
+        }
+      }
+      val colAux = actualizarCol()
+      if(posAux >= dimension){
+        return escenarioNuevo
+      }else {
+        buscarReconversion(escenarioNuevo, posAux, filaAux, colAux)
+      }
     }
-  //descensoNaves(naves, matriz, longitudLista(naves,0))
+    return buscarReconversion(escenario, posInicial, filaInicial, colInicial)
+
+  }
+  // Descenso de naves
+
   // desintegracion de naves
 
   // generacion de naves
@@ -178,13 +249,15 @@ object Main {
     // Obtener las dimensiones del escenario
     val numFilas = 15
     val numColumnas = 11
-    /*val matrizPrueba: List[Int] = List(
-      0, 1, 0, 2, 0,
-      3, 0, 0, 0, 4,
-      0, 0, 5, 0, 0,
-      6, 0, 0, 0, 7,
-      0, 8, 0, 9, 0
-    )*/
+    /*
+    val matrizPrueba: List[Int] = List(
+      0, 3, 0, 2, 0,
+      3, 3, 3, 0, 4,
+      0, 3, 6, 3, 0,
+      6, 0, 0, 8, 3,
+      0, 8, 0, 3, 0
+    )
+    */
 
     //val (numFilas, numColumnas) = obtenerDimensionesMatriz()
     val dimension = numFilas*numColumnas
@@ -201,6 +274,7 @@ object Main {
     // Imprimir escenario
     imprimirEscenario(escenarioInicial, numFilas, numColumnas, puntuacion, vidas)
 
+
     // Movimiento y ejecucion del juego
     def movimiento(posicion: Int, escenario: List[Int]): Unit = {
         println(" mover jugador: ")
@@ -213,12 +287,14 @@ object Main {
             } else {
               // actualizar posicion usuario
               val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
-              val escenarioNuevo = metodos.insertarPosicion(1,posicion-1, escenarioAux) // la nueva posicion contiene al jugador
+              val escenarioAux1 = metodos.insertarPosicion(1,posicion-1, escenarioAux) // la nueva posicion contiene al jugador
               // actualizarEscenario
-              //reconversionNaves
+              // reconversionNaves
+              val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
               //descensoNaves
               //desintegracionNaves
               //generacionNaves
+              // Imprimir el escenario actualizado
               imprimirEscenario(escenarioNuevo, numFilas, numColumnas, puntuacion, vidas)
               movimiento(posicion-1, escenarioNuevo)
             }
@@ -230,12 +306,14 @@ object Main {
             } else {
               // actualizar posicion usuario
               val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
-              val escenarioNuevo = metodos.insertarPosicion(1,posicion+1, escenarioAux) // la nueva posicion contiene al jugador
+              val escenarioAux1 = metodos.insertarPosicion(1,posicion+1, escenarioAux) // la nueva posicion contiene al jugador
               // actualizarEscenario
-              //reconversionNaves
+              // reconversionNaves
+              val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
               //descensoNaves
               //desintegracionNaves
               //generacionNaves
+              // Imprimir el escenario actualizado
               imprimirEscenario(escenarioNuevo, numFilas, numColumnas, puntuacion, vidas)
               movimiento(posicion+1, escenarioNuevo)
             }
@@ -249,6 +327,5 @@ object Main {
     // ejecutar el movimiento
     val pos = ((numColumnas/2)+(numFilas-1)*numColumnas)
     movimiento(pos, escenarioInicial)
-
   }
 }

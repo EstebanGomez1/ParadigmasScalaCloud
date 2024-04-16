@@ -23,15 +23,9 @@ package Auxiliar {
       if (randomNumber < 0.5) 2 else 0
     }
 
-    def randomAlien(): Int ={
+    def numeroAleatorio(): Double = {
       val random = new Random()
-      val randN = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
-      if (randN <= 0.4) 3
-      else if (randN>0.4 && randN<=0.65) 4
-      else if (randN>0.65 && randN<=0.8) 5
-      else if (randN>0.8 && randN<=0.85) 6
-      else if (randN>0.85 && randN<=0.98) 7
-      else 8
+      random.nextDouble()
     }
 
 
@@ -57,11 +51,17 @@ package Auxiliar {
       }
     }
 
-    def longitudLista(lista:List[Int], long:Int):Int =
-      lista match{
-        case Nil => long
-        case _ => longitudLista(lista.tail, long+1)
+    def obtenerValorPosicion(pos :Int, lista :List[Int]): Int = {
+      lista match {
+        case Nil => 0
+        case head :: tail =>
+          if (pos == 0) {
+            head
+          } else {
+            obtenerValorPosicion(pos - 1, tail)
+          }
       }
+    }
 
   }
 
