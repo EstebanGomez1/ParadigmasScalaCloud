@@ -23,6 +23,17 @@ package Auxiliar {
       if (randomNumber < 0.5) 2 else 0
     }
 
+    def randomAlien(): Int ={
+      val random = new Random()
+      val randN = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
+      if (randN <= 0.4) 3
+      else if (randN>0.4 && randN<=0.65) 4
+      else if (randN>0.65 && randN<=0.8) 5
+      else if (randN>0.8 && randN<=0.85) 6
+      else if (randN>0.85 && randN<=0.98) 7
+      else if (randN>0.98 && randN<=1) 8
+    }
+
 
     def insertarPosicion(e: Int, pos: Int, lista: List[Int]): List[Int] = {
       lista match {
@@ -45,6 +56,12 @@ package Auxiliar {
         }
       }
     }
+
+    def longitudLista(lista:List[Int], long:Int):Int =
+      lista.match{
+        case Nil => long
+        case _ => longitud(lista.tail, long+1)
+      }
 
   }
 
