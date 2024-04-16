@@ -156,14 +156,14 @@ object Main {
   // Descenso de naves
   def filaAliens(col:Int):List[Int] = col match{
     case 0 => Nil
-    case _ => randomAlien()
+    case _ => metodos.randomAlien()
   }
   def descensoNaves(filaAliens:List[Int], matriz:List[Int], long:Int):List[Int] =
     matriz match{
       case Nil => Nil
-      case m if m.head==2 => 2::descensoNaves(filaNaves.tail, matriz.tail, long-1)
-      case m if long>0 => filaNaves.head::descensoNaves(filaNaves.tail, matriz.tail, long-1)
-      case _ => matriz.head::descensoNaves(filaNaves, matriz.tail, long)
+      case m if m.head==2 => 2::descensoNaves(filaAliens.tail, matriz.tail, long-1)
+      case m if long>0 => filaAliens.head::descensoNaves(filaAliens.tail, matriz.tail, long-1)
+      case _ => matriz.head::descensoNaves(filaAliens, matriz.tail, long)
     }
   //descensoNaves(naves, matriz, longitudLista(naves,0))
   // desintegracion de naves
