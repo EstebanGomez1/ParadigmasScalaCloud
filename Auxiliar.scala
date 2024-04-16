@@ -60,7 +60,7 @@ package Auxiliar {
     def longitudLista(lista:List[Int], long:Int):Int =
       lista.match{
         case Nil => long
-        case _ => longitud(lista.tail, long+1)
+        case _ => longitudLista(lista.tail, long+1)
       }
 
   }
