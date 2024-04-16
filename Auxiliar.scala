@@ -31,7 +31,7 @@ package Auxiliar {
       else if (randN>0.65 && randN<=0.8) 5
       else if (randN>0.8 && randN<=0.85) 6
       else if (randN>0.85 && randN<=0.98) 7
-      else if (randN>0.98 && randN<=1) 8
+      else 8
     }
 
 
