@@ -1,4 +1,3 @@
-import java.util.Random
 import scala.math._
 
 object Constants {
@@ -14,8 +13,9 @@ object Constants {
 }
 
 object Main {
-  import Constants._
   import Auxiliar.Metodos
+  import Constants._
+
   import scala.io.StdIn
 
   val metodos:  Metodos = new Metodos
@@ -31,18 +31,18 @@ object Main {
         obtenerDimensionesMatriz()
       }
       else
-        {
-          // Pedir al usuario que introduzca el valor de la columna
-          print("Introduce el numero de columnas: ")
-          val col = StdIn.readInt()
-          if ( col < 10){
-            println("Dimension no valida")
-            obtenerDimensionesMatriz()
-          }else{
-            // Return dimensiones
-            (fila, col)
-          }
+      {
+        // Pedir al usuario que introduzca el valor de la columna
+        print("Introduce el numero de columnas: ")
+        val col = StdIn.readInt()
+        if ( col < 10){
+          println("Dimension no valida")
+          obtenerDimensionesMatriz()
+        }else{
+          // Return dimensiones
+          (fila, col)
         }
+      }
     } catch {
       case e: NumberFormatException => {
         println("Error: Debes introducir un número válido.")
@@ -236,29 +236,29 @@ object Main {
 
   }
   // Descenso de naves
-def desciendeNaves(matriz:List[Int], fila:Int, col:Int):List[Int] ={
+  def desciendeNaves(matriz:List[Int], fila:Int, col:Int):List[Int] = {
 
-  val dimension = fila*col
+    val dimension = fila*col
 
-  def descensoNaves(posicion: Int, matriz: List[Int], col: Int, fila: Int): List[Int] = {
-    if (matriz==Nil || posicion >= longitudLista(matriz,0)) {
-      matriz
-    } else if (posicion < (fila * col) - col && matriz(posicion+col)!=2 && matriz(posicion+col)!=1 && matriz(posicion)!=2) {
-      val nuevoElemento = matriz(posicion)
-      insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
-    } else if(posicion < (fila * col)-col && matriz(posicion)==2){
-      descensoNaves(posicion+1, matriz, col, fila)
-    }else if(posicion < (fila * col) && posicion>(fila*col)-col){
-      insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
-    }else{
-      insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
+    def descensoNaves(posicion: Int, matriz: List[Int], col: Int, fila: Int): List[Int] = {
+      if (matriz==Nil || posicion >= metodos.longitudLista(matriz,0)) {
+        matriz
+      } else if (posicion < (fila * col) - col && matriz(posicion+col)!=2 && matriz(posicion+col)!=1 && matriz(posicion)!=2) {
+        val nuevoElemento = matriz(posicion)
+        metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+      } else if(posicion < (fila * col)-col && matriz(posicion)==2){
+        descensoNaves(posicion+1, matriz, col, fila)
+      }else if(posicion < (fila * col) && posicion>(fila*col)-col){
+        metodos.insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
+      }else{
+        metodos.insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
+      }
     }
+
+    val escenarioAux = descensoNaves(0, matriz, fila, col)
+
+    return escenarioAux
   }
-
-  val escenarioAux = descensoNaves(0, matriz, fila, col)
-
-  return escenarioAux
-}
   // desintegracion de naves
 
   // generacion de naves
@@ -299,52 +299,56 @@ def desciendeNaves(matriz:List[Int], fila:Int, col:Int):List[Int] ={
 
     // Movimiento y ejecucion del juego
     def movimiento(posicion: Int, escenario: List[Int]): Unit = {
-        println(" mover jugador: ")
-        val entrada = StdIn.readChar() // entrada de teclado para el movimiento
-        entrada match {
-          case 'a' => {
-            if (posicion-1 > (numColumnas*numFilas - 1) || posicion-1 < numColumnas*(numFilas-1)) {
-              println("Movimiento no válido")
-              movimiento(posicion, escenario)
-            } else {
-              // actualizar posicion usuario
-              val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
-              val escenarioAux1 = metodos.insertarPosicion(1,posicion-1, escenarioAux) // la nueva posicion contiene al jugador
-              // actualizarEscenario
-              // reconversionNaves
-              val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
-              //descensoNaves
-              //desintegracionNaves
-              //generacionNaves
-              // Imprimir el escenario actualizado
-              imprimirEscenario(escenarioNuevo, numFilas, numColumnas, puntuacion, vidas)
-              movimiento(posicion-1, escenarioNuevo)
-            }
-          }
-          case 'd' => {
-            if (posicion+1 > (numColumnas*numFilas - 1) || posicion+1 < numColumnas*(numFilas-1)) {
-              println("Movimiento no válido")
-              movimiento(posicion, escenario)
-            } else {
-              // actualizar posicion usuario
-              val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
-              val escenarioAux1 = metodos.insertarPosicion(1,posicion+1, escenarioAux) // la nueva posicion contiene al jugador
-              // actualizarEscenario
-              // reconversionNaves
-              val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
-              //descensoNaves
-              //desintegracionNaves
-              //generacionNaves
-              // Imprimir el escenario actualizado
-              imprimirEscenario(escenarioNuevo, numFilas, numColumnas, puntuacion, vidas)
-              movimiento(posicion+1, escenarioNuevo)
-            }
-          }
-          case _   => {
+      println(" mover jugador: ")
+      val entrada = StdIn.readChar() // entrada de teclado para el movimiento
+      entrada match {
+        case 'a' => {
+          if (posicion-1 > (numColumnas*numFilas - 1) || posicion-1 < numColumnas*(numFilas-1)) {
             println("Movimiento no válido")
             movimiento(posicion, escenario)
+          } else {
+            // actualizar posicion usuario
+            val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
+            val escenarioAux1 = metodos.insertarPosicion(1,posicion-1, escenarioAux) // la nueva posicion contiene al jugador
+            // actualizarEscenario
+            // reconversionNaves
+            val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
+            //descensoNaves
+            val escenarioNuevo1 = desciendeNaves(escenarioNuevo, numColumnas, numFilas)
+            //desintegracionNaves
+            //generacionNaves
+            val tablero = metodos.rellenar(escenarioNuevo1, numColumnas, numFilas, numFilas*numColumnas)
+            // Imprimir el escenario actualizado
+            imprimirEscenario(tablero, numFilas, numColumnas, puntuacion, vidas)
+            movimiento(posicion-1, tablero)
           }
         }
+        case 'd' => {
+          if (posicion+1 > (numColumnas*numFilas - 1) || posicion+1 < numColumnas*(numFilas-1)) {
+            println("Movimiento no válido")
+            movimiento(posicion, escenario)
+          } else {
+            // actualizar posicion usuario
+            val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
+            val escenarioAux1 = metodos.insertarPosicion(1,posicion+1, escenarioAux) // la nueva posicion contiene al jugador
+            // actualizarEscenario
+            // reconversionNaves
+            val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
+            //descensoNaves
+            val escenarioNuevo1 = desciendeNaves(escenarioNuevo, numColumnas, numFilas)
+            //desintegracionNaves
+            //generacionNaves
+            val tablero = metodos.rellenar(escenarioNuevo1, numColumnas, numFilas, numFilas*numColumnas)
+            // Imprimir el escenario actualizado
+            imprimirEscenario(tablero, numFilas, numColumnas, puntuacion, vidas)
+            movimiento(posicion+1, tablero)
+          }
+        }
+        case _   => {
+          println("Movimiento no válido")
+          movimiento(posicion, escenario)
+        }
+      }
     }
     // ejecutar el movimiento
     val pos = ((numColumnas/2)+(numFilas-1)*numColumnas)
