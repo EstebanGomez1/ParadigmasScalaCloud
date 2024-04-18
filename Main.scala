@@ -236,7 +236,29 @@ object Main {
 
   }
   // Descenso de naves
+def desciendeNaves(matriz:List[Int], fila:Int, col:Int):List[Int] ={
 
+  val dimension = fila*col
+
+  def descensoNaves(posicion: Int, matriz: List[Int], col: Int, fila: Int): List[Int] = {
+    if (matriz==Nil || posicion >= longitudLista(matriz,0)) {
+      matriz
+    } else if (posicion < (fila * col) - col && matriz(posicion+col)!=2 && matriz(posicion+col)!=1 && matriz(posicion)!=2) {
+      val nuevoElemento = matriz(posicion)
+      insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+    } else if(posicion < (fila * col)-col && matriz(posicion)==2){
+      descensoNaves(posicion+1, matriz, col, fila)
+    }else if(posicion < (fila * col) && posicion>(fila*col)-col){
+      insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
+    }else{
+      insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
+    }
+  }
+
+  val escenarioAux = descensoNaves(0, matriz, fila, col)
+
+  return escenarioAux
+}
   // desintegracion de naves
 
   // generacion de naves

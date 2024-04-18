@@ -63,6 +63,30 @@ package Auxiliar {
       }
     }
 
+    def randomAlien(): Int ={
+      val random = new Random()
+      val randN = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
+      if (randN <= 0.4) 3
+      else if (randN>0.4 && randN<=0.65) 4
+      else if (randN>0.65 && randN<=0.8) 5
+      else if (randN>0.8 && randN<=0.85) 6
+      else if (randN>0.85 && randN<=0.98) 7
+      else 8
+    }
+
+    def rellenar(matriz:List[Int], col:Int, fila:Int, dimension:Int):List[Int]=
+      dimension match{
+        case 0 => Nil
+        case d if d>(fila*col)-col => randomAlien()::rellenar(matriz.tail, col, fila, dimension-1)
+        case _ => matriz.head::rellenar(matriz.tail, col, fila, dimension-1)
+      }
+
+    def longitudLista(lista:List[Int], long:Int):Int =
+      lista match{
+        case Nil => long
+        case _ => longitudLista(lista.tail, long+1)
+      }
+
   }
 
 }
