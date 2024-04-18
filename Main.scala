@@ -10,6 +10,11 @@ object Constants {
   val destructor: Int = 6
   val crucero: Int = 7
   val comandante: Int = 8
+  val destruccionCruceroHorizontal = -2
+  val destruccionCruceroVertical = -6
+  val destruccionComandante = -3
+  val destruccionDestructor = -4
+  val destruccionJugador = -5
 }
 
 object Main {
@@ -240,14 +245,33 @@ object Main {
 
     val dimension = fila*col
 
+    def elemento(e:Int):Int ={
+      if (e==7) {
+        if (metodos.numeroAleatorio()<=0.5) return -2
+        else return -6
+      }else if(e==8) return -3
+      else if(e==6) return -4
+      else if(e==1)return -5
+      else return 2
+    }
     def descensoNaves(posicion: Int, matriz: List[Int], col: Int, fila: Int): List[Int] = {
       if (matriz==Nil || posicion >= metodos.longitudLista(matriz,0)) {
         matriz
-      } else if (posicion < (fila * col) - col && matriz(posicion+col)!=2 && matriz(posicion+col)!=1 && matriz(posicion)!=2) {
+      } else if (posicion < (fila * col) - col*2 && matriz(posicion+col)!=2) {
         val nuevoElemento = matriz(posicion)
+        if(nuevoElemento==2)
+          metodos.insertarPosicion(nuevoElemento, posicion, descensoNaves(posicion + 1, matriz, col, fila))
+        else
+          metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+      }else if (posicion < (fila * col) - col*2 && matriz(posicion+col)==2){
+        val nuevoElemento = elemento(matriz(posicion))
+        if(nuevoElemento==2)
+          metodos.insertarPosicion(nuevoElemento, posicion, descensoNaves(posicion + 1, matriz, col, fila))
+        else
+          metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+      } else if(posicion < (fila * col)-col && matriz(posicion)==1){
+        val nuevoElemento = elemento(matriz(posicion))
         metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
-      } else if(posicion < (fila * col)-col && matriz(posicion)==2){
-        descensoNaves(posicion+1, matriz, col, fila)
       }else if(posicion < (fila * col) && posicion>(fila*col)-col){
         metodos.insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
       }else{
