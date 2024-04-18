@@ -1,3 +1,4 @@
+
 import scala.math._
 
 object Constants {
@@ -269,9 +270,18 @@ object Main {
           metodos.insertarPosicion(nuevoElemento, posicion, descensoNaves(posicion + 1, matriz, col, fila))
         else
           metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+      } else if(posicion < (fila * col)-col && matriz(posicion+col)!=1){
+        val nuevoElemento = elemento(matriz(posicion))
+        if(matriz(posicion)==0 || matriz(posicion)==3 || matriz(posicion)==4 || matriz(posicion)==5)
+          metodos.insertarPosicion(matriz(posicion), posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+        else
+          metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
       } else if(posicion < (fila * col)-col && matriz(posicion)==1){
         val nuevoElemento = elemento(matriz(posicion))
-        metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+        if(matriz(posicion)!=0)
+          metodos.insertarPosicion(nuevoElemento, posicion+col, descensoNaves(posicion + 1, matriz, col, fila))
+        else
+          metodos.insertarPosicion(1, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
       }else if(posicion < (fila * col) && posicion>(fila*col)-col){
         metodos.insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
       }else{
