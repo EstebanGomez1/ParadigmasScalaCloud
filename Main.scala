@@ -331,11 +331,35 @@ object Main {
     // Imprimir escenario
     imprimirEscenario(escenarioInicial, numFilas, numColumnas, puntuacion, vidas)
 
+    def modo():Char = {
+      println("---MODO DE EJECUCION---")
+      println("1 - modo automatico")
+      println("2 - modo manual")
+      val m = StdIn.readChar()
+      /*if(m.'1' || m!='2'){
+        println("No se ha introducido un modo correcto, introduzca de nuevo")
+        return modo()
+      }*/
+      return m
+    }
 
+    val modoejecucion = modo()
     // Movimiento y ejecucion del juego
     def movimiento(posicion: Int, escenario: List[Int]): Unit = {
       println(" mover jugador: ")
-      val entrada = StdIn.readChar() // entrada de teclado para el movimiento
+      def valentrada():Char = {
+        if (modoejecucion == 2) {
+          return StdIn.readChar() // entrada de teclado para el movimiento
+        } else {
+          Thread.sleep(1500)
+          if (metodos.randomFunction > 0.5) {
+            return 'a'
+          } else {
+            return 'd'
+          }
+        }
+      }
+      val entrada = valentrada()
       entrada match {
         case 'a' => {
           if (posicion-1 > (numColumnas*numFilas - 1) || posicion-1 < numColumnas*(numFilas-1)) {
