@@ -10,6 +10,7 @@ object Constants {
   val destructor: Int = 6
   val crucero: Int = 7
   val comandante: Int = 8
+  val destruccion = -1
   val destruccionCruceroHorizontal = -2
   val destruccionCruceroVertical = -6
   val destruccionComandante = -3
@@ -294,8 +295,64 @@ object Main {
 
     return escenarioAux
   }
-  // desintegracion de naves
 
+  // desintegracion de naves
+  def destruccionNaveDestructor(escenario :List[Int], pos :Int):List[Int] = {
+    return List(0)
+  }
+
+  def destruccionHorizontal(escenario: List[Int], col: Int, fila: Int, pos: Int):List[Int] = {
+    return List(0)
+  }
+
+  def destruccionVertical(escenario: List[Int], col: Int, fila: Int, pos: Int):List[Int] = {
+    return List(0)
+  }
+
+  def desintegracionNaves(escenario :List[Int], numFilas :Int, numColumnas :Int, puntuacion :Int, vidas :Int):(List[Int], Int, Int) = {
+    val filaInicial = 0
+    val colInicial = 0
+    val posInicial = 0
+    val dimension = numFilas*numColumnas
+    def recorrerEscenario(escenarioAux :List[Int], pos :Int, fila :Int, col :Int): Unit = {
+      if (pos < dimension) {
+        // desintegracion en los muros
+        val valor = metodos.obtenerValorPosicion(pos,escenarioAux)
+        if(fila == numFilas-5 ){
+          def destruccionMuros():List[Int] = {
+            valor match {
+              case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, col, fila, pos)
+              case `destruccionCruceroVertical` => destruccionVertical(escenarioAux, col, fila, pos)
+              case  `destruccionDestructor` => destruccionNaveDestructor(escenarioAux, pos)
+              case _ => escenarioAux
+            }
+          }
+          val escenarioDestruido = destruccionMuros()
+        }
+        // desintegracion en la tierra
+        else if (fila == numFilas-1 && valor == `destruccionDestructor`){
+          val escenarioDestruido = destruccionNaveDestructor(escenarioAux, pos)
+        }else{
+          val escenarioDestruido = escenarioAux
+        }
+        // actualizar datos para la siguiente iteracion
+        def actualizarFilas(posAux: Int, fila: Int): Int = {
+          if (posAux % numColumnas == 0) {
+            return fila + 1
+          } else {
+            return fila
+          }
+        }
+        val posAux = pos + 1
+        val filaNueva = actualizarFilas(posAux, fila)
+        recorrerEscenario(escenarioDestruido, posAux, filaNueva, col)
+      }else{
+        return escenarioAux
+      }
+    }
+    val escenarioNuevo = recorrerEscenario(escenario, posInicial, filaInicial, colInicial)
+    return (escenarioNuevo, puntuacion, vidas)
+  }
   // generacion de naves
 
 
@@ -351,11 +408,21 @@ object Main {
         if (modoejecucion == 2) {
           return StdIn.readChar() // entrada de teclado para el movimiento
         } else {
-          Thread.sleep(1500)
           if (metodos.randomFunction > 0.5) {
-            return 'a'
+            if (posicion-1 > (numColumnas*numFilas - 1) || posicion-1 < numColumnas*(numFilas-1)) {
+              return valentrada()
+            }else {
+              Thread.sleep(1500)
+              return 'a'
+            }
+
           } else {
+          if (posicion+1 > (numColumnas*numFilas - 1) || posicion+1 < numColumnas*(numFilas-1)) {
+            return valentrada()
+          }else {
+            Thread.sleep(1500)
             return 'd'
+          }
           }
         }
       }
