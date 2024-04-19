@@ -297,16 +297,63 @@ object Main {
   }
 
   // desintegracion de naves
-  def destruccionNaveDestructor(escenario :List[Int], pos :Int):List[Int] = {
-    return List(0)
+  def destruccionNaveDestructor(escenario :List[Int], numFilas :Int, numColumnas :Int, pos :Int):List[Int] = {
+    val radio = 5
+    val posInicial = pos-numColumnas*radio-5
+    val dimension = numFilas*numColumnas
+
+    def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, posInicialAux :Int, contadorH :Int, contadorV :Int): List[Int] ={
+      if(posAux < dimension && contadorV < radio*2){
+        val escenarioNuevo = metodos.insertarPosicion(0, posAux, escenarioAux)
+        if((posAux+1)%numColumnas == 0 || contadorH >= radio*2){
+          val posInicialAuxNueva = posInicialAux+numColumnas
+          val posAuxNueva = posInicialAuxNueva
+          aplicarDestruccion(escenarioNuevo, posAuxNueva, posInicialAuxNueva, 0, contadorV+1)
+        }else{
+          val posAuxNueva = posAux+1
+          aplicarDestruccion(escenarioNuevo, posAuxNueva, posInicialAux, contadorH+1, contadorV)
+        }
+      }else{
+        return escenarioAux
+      }
+    }
+    return aplicarDestruccion(escenario, posInicial, posInicial, 0, 0)
   }
 
-  def destruccionHorizontal(escenario: List[Int], col: Int, fila: Int, pos: Int):List[Int] = {
-    return List(0)
+  def destruccionHorizontal(escenario: List[Int], numColumnas: Int, numFilas: Int, pos: Int):List[Int] = {
+    val dimension = numFilas*numColumnas
+    def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, mov :Int):List[Int] = {
+      if( mov < 0 && posAux%numColumnas == 0){
+        return metodos.insertarPosicion(0, posAux, escenarioAux)
+      }else if (posAux%numColumnas != 0){
+        val escenarioNuevo = metodos.insertarPosicion(0, posAux, escenarioAux)
+        val posAuxNueva = posAux+mov
+        aplicarDestruccion(escenarioNuevo, posAuxNueva, mov)
+      }
+      else
+      {
+        return escenarioAux
+      }
+    }
+    val escenarioDestruido1 = aplicarDestruccion(escenario, pos, -1)
+    val escenarioDestruido2 = aplicarDestruccion(escenarioDestruido1, pos, 1)
+    return escenarioDestruido2
   }
 
-  def destruccionVertical(escenario: List[Int], col: Int, fila: Int, pos: Int):List[Int] = {
-    return List(0)
+  def destruccionVertical(escenario: List[Int], numColumnas: Int, numFilas: Int, pos: Int):List[Int] = {
+    val dimension = numFilas*numColumnas
+    def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, mov :Int):List[Int] = {
+      if( posAux >0 && posAux < dimension){
+        val escenarioNuevo = metodos.insertarPosicion(0, posAux, escenarioAux)
+        val posAuxNueva = posAux+mov*numColumnas
+        aplicarDestruccion(escenarioNuevo, posAuxNueva, mov)
+      }else{
+        return escenarioAux
+      }
+    }
+    val escenarioDestruido1 = aplicarDestruccion(escenario, pos, -1)
+    val escenarioDestruido2 = aplicarDestruccion(escenarioDestruido1, pos, 1)
+    return escenarioDestruido2
   }
 
   def desintegracionNaves(escenario :List[Int], numFilas :Int, numColumnas :Int, puntuacion :Int, vidas :Int):(List[Int], Int, Int) = {
@@ -324,7 +371,7 @@ object Main {
               valor match {
                 case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, col, fila, pos)
                 case `destruccionCruceroVertical` => destruccionVertical(escenarioAux, col, fila, pos)
-                case  `destruccionDestructor` => destruccionNaveDestructor(escenarioAux, pos)
+                case  `destruccionDestructor` => destruccionNaveDestructor(escenarioAux, numFilas, numColumnas, pos)
                 case _ => escenarioAux
               }
             }
@@ -332,7 +379,7 @@ object Main {
           }
           // desintegracion en la tierra
           else if (fila == numFilas-1 && valor == `destruccionDestructor`){
-            return destruccionNaveDestructor(escenarioAux, pos)
+            return destruccionNaveDestructor(escenarioAux, numFilas, numColumnas, pos)
           }else{
             return escenarioAux
           }
