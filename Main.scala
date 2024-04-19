@@ -314,27 +314,30 @@ object Main {
     val colInicial = 0
     val posInicial = 0
     val dimension = numFilas*numColumnas
-    def recorrerEscenario(escenarioAux :List[Int], pos :Int, fila :Int, col :Int): Unit = {
+    def recorrerEscenario(escenarioAux :List[Int], pos :Int, fila :Int, col :Int):List[Int] = {
       if (pos < dimension) {
         // desintegracion en los muros
         val valor = metodos.obtenerValorPosicion(pos,escenarioAux)
-        if(fila == numFilas-5 ){
-          def destruccionMuros():List[Int] = {
-            valor match {
-              case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, col, fila, pos)
-              case `destruccionCruceroVertical` => destruccionVertical(escenarioAux, col, fila, pos)
-              case  `destruccionDestructor` => destruccionNaveDestructor(escenarioAux, pos)
-              case _ => escenarioAux
+        def aplicarDestrucciones():List[Int] = {
+          if(fila == numFilas-5 ){
+            def destruccionMuros():List[Int] = {
+              valor match {
+                case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, col, fila, pos)
+                case `destruccionCruceroVertical` => destruccionVertical(escenarioAux, col, fila, pos)
+                case  `destruccionDestructor` => destruccionNaveDestructor(escenarioAux, pos)
+                case _ => escenarioAux
+              }
             }
+            return destruccionMuros()
           }
-          val escenarioDestruido = destruccionMuros()
+          // desintegracion en la tierra
+          else if (fila == numFilas-1 && valor == `destruccionDestructor`){
+            return destruccionNaveDestructor(escenarioAux, pos)
+          }else{
+            return escenarioAux
+          }
         }
-        // desintegracion en la tierra
-        else if (fila == numFilas-1 && valor == `destruccionDestructor`){
-          val escenarioDestruido = destruccionNaveDestructor(escenarioAux, pos)
-        }else{
-          val escenarioDestruido = escenarioAux
-        }
+
         // actualizar datos para la siguiente iteracion
         def actualizarFilas(posAux: Int, fila: Int): Int = {
           if (posAux % numColumnas == 0) {
@@ -345,7 +348,7 @@ object Main {
         }
         val posAux = pos + 1
         val filaNueva = actualizarFilas(posAux, fila)
-        recorrerEscenario(escenarioDestruido, posAux, filaNueva, col)
+        recorrerEscenario(aplicarDestrucciones(), posAux, filaNueva, col)
       }else{
         return escenarioAux
       }
