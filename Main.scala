@@ -411,8 +411,8 @@ object Main {
     println(" - Dimensiones - ")
 
     // Obtener las dimensiones del escenario
-    val numFilas = 15
-    val numColumnas = 11
+    val numFilas = 5
+    val numColumnas = 5
     /*
     val matrizPrueba: List[Int] = List(
       0, 3, 0, 2, 0,
@@ -438,12 +438,13 @@ object Main {
     // Imprimir escenario
     imprimirEscenario(escenarioInicial, numFilas, numColumnas, puntuacion, vidas)
 
-    def modo():Char = {
+    def modo():Int = {
       println("---MODO DE EJECUCION---")
-      println("1 - modo automatico")
-      println("2 - modo manual")
-      val m = StdIn.readChar()
-      /*if(m.'1' || m!='2'){
+      println("1 - modo manual")
+      println("2 - modo automatico")
+      val m = StdIn.readInt()
+      /*
+      if(m != 1 || m != 2){
         println("No se ha introducido un modo correcto, introduzca de nuevo")
         return modo()
       }*/
@@ -453,9 +454,9 @@ object Main {
     val modoejecucion = modo()
     // Movimiento y ejecucion del juego
     def movimiento(posicion: Int, escenario: List[Int]): Unit = {
-      println(" mover jugador: ")
+      if( modoejecucion == 1) {println(" mover jugador: ") }
       def valentrada():Char = {
-        if (modoejecucion == 2) {
+        if (modoejecucion == 1) {
           return StdIn.readChar() // entrada de teclado para el movimiento
         } else {
           if (metodos.randomFunction > 0.5) {
