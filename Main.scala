@@ -259,36 +259,35 @@ object Main {
     def descensoNaves(posicion: Int, matriz: List[Int], col: Int, fila: Int): List[Int] = {
       if (matriz==Nil || posicion >= metodos.longitudLista(matriz,0)) {
         matriz
-      } else if (posicion < (fila * col) - col*2 && matriz(posicion+col)!=2) {
-        val nuevoElemento = matriz(posicion)
+      } else if (posicion < (fila * col) - col*2 && metodos.obtenerValorPosicion(posicion+col, matriz)!=2) {
+        val nuevoElemento = metodos.obtenerValorPosicion(posicion, matriz)
         if(nuevoElemento==2)
           metodos.insertarPosicion(nuevoElemento, posicion, descensoNaves(posicion + 1, matriz, col, fila))
         else
           metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
-      }else if (posicion < (fila * col) - col*2 && matriz(posicion+col)==2){
-        val nuevoElemento = elemento(matriz(posicion))
+      }else if (posicion < (fila * col) - col*2 && metodos.obtenerValorPosicion(posicion+col, matriz)==2){
+        val nuevoElemento = elemento(metodos.obtenerValorPosicion(posicion, matriz))
         if(nuevoElemento==2)
           metodos.insertarPosicion(nuevoElemento, posicion, descensoNaves(posicion + 1, matriz, col, fila))
         else
           metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
-      } else if(posicion < (fila * col)-col && matriz(posicion+col)!=1){
-        val nuevoElemento = elemento(matriz(posicion))
-        if(matriz(posicion)==3 || matriz(posicion)==4 || matriz(posicion)==5)
+      }
+      else if(posicion < (fila * col)-col && metodos.obtenerValorPosicion(posicion+col, matriz)==1) {
+        if (metodos.obtenerValorPosicion(posicion, matriz) == 0) {
+          metodos.insertarPosicion(1, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+        } else {
+          metodos.insertarPosicion(-5, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+        }
+      }else if(posicion < (fila * col)-col && metodos.obtenerValorPosicion(posicion+col, matriz)!=1){
+        val nuevoElemento = elemento(metodos.obtenerValorPosicion(posicion, matriz))
+        if(metodos.obtenerValorPosicion(posicion, matriz)==3 || metodos.obtenerValorPosicion(posicion, matriz)==4 || metodos.obtenerValorPosicion(posicion, matriz)==5)
           metodos.insertarPosicion(-1, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
-        else if(matriz(posicion)==0)
+        else if(metodos.obtenerValorPosicion(posicion, matriz)==0)
           metodos.insertarPosicion(0, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
         else
           metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
-      } else if(posicion < (fila * col)-col && matriz(posicion+col)==1){
-        if(matriz(posicion)!=0) {
-          val nuevoElemento = elemento(matriz(posicion+col))
-          metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
-        }else
-          metodos.insertarPosicion(1, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
-      }else if(posicion < (fila * col) && posicion>(fila*col)-col){
-        metodos.insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
       }else{
-        metodos.insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
+        return matriz
       }
     }
 
@@ -412,8 +411,8 @@ object Main {
     println(" - Dimensiones - ")
 
     // Obtener las dimensiones del escenario
-    val numFilas = 5
-    val numColumnas = 5
+    val numFilas = 15
+    val numColumnas = 10
     /*
     val matrizPrueba: List[Int] = List(
       0, 3, 0, 2, 0,
