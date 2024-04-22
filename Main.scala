@@ -252,9 +252,10 @@ object Main {
         else return -6
       }else if(e==8) return -3
       else if(e==6) return -4
-      else if(e==1)return -5
+      else if(e==1) return -5
       else return 2
     }
+
     def descensoNaves(posicion: Int, matriz: List[Int], col: Int, fila: Int): List[Int] = {
       if (matriz==Nil || posicion >= metodos.longitudLista(matriz,0)) {
         matriz
@@ -278,11 +279,11 @@ object Main {
           metodos.insertarPosicion(0, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
         else
           metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
-      } else if(posicion < (fila * col)-col && matriz(posicion)==1){
-        val nuevoElemento = elemento(matriz(posicion))
-        if(matriz(posicion)!=0)
-          metodos.insertarPosicion(nuevoElemento, posicion+col, descensoNaves(posicion + 1, matriz, col, fila))
-        else
+      } else if(posicion < (fila * col)-col && matriz(posicion+col)==1){
+        if(matriz(posicion)!=0) {
+          val nuevoElemento = elemento(matriz(posicion+col))
+          metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+        }else
           metodos.insertarPosicion(1, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
       }else if(posicion < (fila * col) && posicion>(fila*col)-col){
         metodos.insertarPosicion(matriz(posicion), posicion, descensoNaves(posicion+1, matriz, col, fila))
@@ -468,12 +469,12 @@ object Main {
             }
 
           } else {
-          if (posicion+1 > (numColumnas*numFilas - 1) || posicion+1 < numColumnas*(numFilas-1)) {
-            return valentrada()
-          }else {
-            Thread.sleep(1500)
-            return 'd'
-          }
+            if (posicion+1 > (numColumnas*numFilas - 1) || posicion+1 < numColumnas*(numFilas-1)) {
+              return valentrada()
+            }else {
+              Thread.sleep(1500)
+              return 'd'
+            }
           }
         }
       }
