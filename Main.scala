@@ -327,7 +327,7 @@ object Main {
     def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, mov :Int):List[Int] = {
       def nuevoValor():List[Int] = {
         val valor = metodos.obtenerValorPosicion(posAux, escenarioAux)
-        if( valor == 1){ // el jugador es afectado
+        if( valor == 1 || valor ==`destruccionJugador` ){ // el jugador es afectado
           return metodos.insertarPosicion(`destruccionJugador`, posAux, escenarioAux)
         }else {
           return metodos.insertarPosicion(0, posAux, escenarioAux)
@@ -356,7 +356,7 @@ object Main {
       if( posAux >0 && posAux < dimension){
         def nuevoValor():List[Int] = {
           val valor = metodos.obtenerValorPosicion(posAux, escenarioAux)
-          if( valor == 1){ // el jugador es afectado
+          if( valor == 1 || valor ==`destruccionJugador` ){ // el jugador es afectado
             return metodos.insertarPosicion(`destruccionJugador`, posAux, escenarioAux)
           }else {
             return metodos.insertarPosicion(0, posAux, escenarioAux)
