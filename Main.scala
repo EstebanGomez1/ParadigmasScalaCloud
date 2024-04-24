@@ -297,29 +297,57 @@ object Main {
   }
 
   // desintegracion de naves
-  def destruccionNaveDestructor(escenario :List[Int], numFilas :Int, numColumnas :Int, pos :Int):List[Int] = {
-    val radio = 5
-    val posInicial = pos-numColumnas*radio-5
-    val dimension = numFilas*numColumnas
+  def destruccionNaveDestructor(escenario:List[Int], numFilas:Int, numColumnas:Int, pos:Int):List[Int] ={
 
-    def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, posInicialAux :Int, contadorH :Int, contadorV :Int): List[Int] ={
-      if(posAux < dimension && contadorV < radio*2){
-        val escenarioNuevo = metodos.insertarPosicion(0, posAux, escenarioAux)
-        if((posAux+1)%numColumnas == 0 || contadorH >= radio*2){
-          val posInicialAuxNueva = posInicialAux+numColumnas
-          val posAuxNueva = posInicialAuxNueva
-          aplicarDestruccion(escenarioNuevo, posAuxNueva, posInicialAuxNueva, 0, contadorV+1)
-        }else{
-          val posAuxNueva = posAux+1
-          aplicarDestruccion(escenarioNuevo, posAuxNueva, posInicialAux, contadorH+1, contadorV)
+    val fila = numFilas
+    val col = numColumnas
+
+    def destruccionDestructor(matriz:List[Int], col:Int, fila:Int, pos:Int, numero:Int, radio:Int, limite:Int):List[Int] ={
+      if(pos>=matriz.length) matriz
+      else if(matriz(pos)!=1){
+        if(numero<limite && pos%col!=0 && limite==11) {
+          metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio, limite))
+        } else if(numero<limite && limite<11) {
+          metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio, limite))
+        } else if(numero<limite && limite==11) {
+          metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio, limite))
+        } else if(radio>=10) {
+          matriz
+        } else {
+          metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, (pos-numero)+col, 0, radio+1, limite))
         }
-      }else{
-        return escenarioAux
+      }else {
+        metodos.insertarPosicion(1, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio+1, limite))
       }
     }
-    // falta reconstruir muro si se rompe
-    return aplicarDestruccion(escenario, posInicial, posInicial, 0, 0)
+
+    val esc = if(pos%col==0){
+      println("aaaaaaaaaaaaaaaaaaaaaaaaaa")
+      destruccionDestructor(escenario, col, fila, (pos)-col*5, 0, 0, 6)
+    }else if(pos%col==1){
+      println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+      destruccionDestructor(escenario, col, fila, (pos-1)-col*5, 0, 0, 7)
+    }else if(pos%col==2){
+      println("ccccccccccccccccccccccccccccc")
+      destruccionDestructor(escenario, col, fila, (pos-2)-col*5, 0, 0, 8)
+    }else if(pos%col==3){
+      println("dddddddddddddddddddddddd")
+      destruccionDestructor(escenario, col, fila, (pos-3)-col*5, 0, 0, 9)
+    }else if(pos%col==4){
+      println("eeeeeeeeeeeeeeeeeeeeeeeeeeee")
+      destruccionDestructor(escenario, col, fila, (pos-4)-col*5, 0, 0, 10)
+    }else if(pos%col==5){
+      println("eeeeeeeeeeeeeeeeeeeeeeeeeeee")
+      destruccionDestructor(escenario, col, fila, (pos-5)-col*5, 0, 0, 11)
+    }
+    else{
+      println("11111111111111111111111111111")
+      destruccionDestructor(escenario, col, fila, (pos-5)-col*5, 0, 0, 11)
+    }
+
+    return esc
   }
+
 
   def destruccionHorizontal(escenario: List[Int], numColumnas: Int, numFilas: Int, pos: Int):List[Int] = {
     val dimension = numFilas*numColumnas
@@ -388,7 +416,8 @@ object Main {
               valor match {
                 case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, numColumnas, numFilas, pos)
                 case `destruccionCruceroVertical` => destruccionVertical(escenarioAux, numColumnas, numFilas, pos)
-                //case  `destruccionDestructor` => destruccionNaveDestructor(escenarioAux, numFilas, numColumnas, pos)
+                case  `destruccionDestructor` => {println(pos)
+                  destruccionNaveDestructor(escenarioAux, numColumnas, numFilas, pos)}
                 case _ => escenarioAux
               }
             }
@@ -398,7 +427,7 @@ object Main {
           else if (fila == numFilas-1){
             println(s"valor = $valor")
             valor match{
-              //case `destruccionDestructor` => destruccionNaveDestructor(escenarioAux, numFilas, numColumnas, pos)
+              case `destruccionDestructor` => destruccionNaveDestructor(escenarioAux, numFilas, numColumnas, pos)
               case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, numColumnas, numFilas, pos)
               case `destruccionCruceroVertical` => destruccionVertical(escenarioAux, numColumnas, numFilas, pos)
               case _ => escenarioAux
@@ -440,7 +469,7 @@ object Main {
     }
     val (escenarioNuevo1,vidasNuevas) = buscarJugador(escenarioNuevo,numColumnas*numFilas-numColumnas)
     // Puntuaciones
-    
+
     return (escenarioNuevo1, puntuacion, vidasNuevas)
   }
   // generacion de naves
@@ -451,8 +480,8 @@ object Main {
     println(" - Dimensiones - ")
 
     // Obtener las dimensiones del escenario
-    val numFilas = 10
-    val numColumnas = 8
+    val numFilas = 15
+    val numColumnas = 15
     /*
     val matrizPrueba: List[Int] = List(
       0, 3, 0, 2, 0,
