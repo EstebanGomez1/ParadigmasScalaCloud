@@ -303,13 +303,13 @@ object Main {
     val col = numColumnas
 
     def destruccionDestructor(matriz:List[Int], col:Int, fila:Int, pos:Int, numero:Int, radio:Int, limite:Int):List[Int] ={
-      if(pos>=matriz.length) matriz
-      else if(matriz(pos)!=1){
+      if(pos>=metodos.longitudLista(matriz, 0)) matriz
+      else if(metodos.obtenerValorPosicion(pos, matriz)!=1){
         if(numero<limite && pos%col!=0 && limite==11) {
           metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio, limite))
         } else if(numero<limite && limite<11) {
           metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio, limite))
-        } else if(numero<limite && limite==11) {
+        } else if(numero<limite && limite==11 && numero<1) {
           metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio, limite))
         } else if(radio>=10) {
           matriz
