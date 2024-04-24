@@ -87,6 +87,15 @@ package Auxiliar {
         case _ => longitudLista(lista.tail, long+1)
       }
 
+    def eliminarUltimo(lista: List[Int]): List[Int] = {
+      lista match {
+        case Nil          => Nil // Si la lista es vacía, retornamos una lista vacía
+        case _ :: Nil     => Nil // Si la lista tiene un solo elemento, retornamos una lista vacía
+        case cabeza :: cola => cabeza :: eliminarUltimo(cola) // Caso recursivo: mantenemos la cabeza y eliminamos el último elemento de la cola
+      }
+    }
+
+
   }
 
 }

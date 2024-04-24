@@ -16,6 +16,9 @@ object Constants {
   val destruccionComandante = -3
   val destruccionDestructor = -4
   val destruccionJugador = -5
+  val destruccionAlien = -7
+  val destruccionNube = -8
+  val destruccionCefalopodo = -9
 }
 
 object Main {
@@ -83,7 +86,8 @@ object Main {
           case `destructor` => " D "
           case `crucero` => " R "
           case `comandante` => " X "
-          case _ => " " + valor + " "
+          //case _ => " " + valor + " "
+          case _ => "   "
         }
         print(symbol)
         if (j == matrix.length - 1){
@@ -253,7 +257,10 @@ object Main {
       }else if(e==8) return -3
       else if(e==6) return -4
       else if(e==1) return -5
-      else return 2
+      else if(e==3) return -7
+      else if(e==4) return -8
+      else if(e==5) return -9
+      else return -1
     }
 
     def descensoNaves(posicion: Int, matriz: List[Int], col: Int, fila: Int): List[Int] = {
@@ -267,8 +274,8 @@ object Main {
           metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
       }else if (posicion < (fila * col) - col*2 && metodos.obtenerValorPosicion(posicion+col, matriz)==2){
         val nuevoElemento = elemento(metodos.obtenerValorPosicion(posicion, matriz))
-        if(nuevoElemento==2)
-          metodos.insertarPosicion(nuevoElemento, posicion, descensoNaves(posicion + 1, matriz, col, fila))
+        if(nuevoElemento == -7 || nuevoElemento == -8 || nuevoElemento == -9  || nuevoElemento == -1 )
+          metodos.insertarPosicion(2, posicion, descensoNaves(posicion + 1, matriz, col, fila))
         else
           metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
       }
@@ -281,7 +288,7 @@ object Main {
       }else if(posicion < (fila * col)-col && metodos.obtenerValorPosicion(posicion+col, matriz)!=1){
         val nuevoElemento = elemento(metodos.obtenerValorPosicion(posicion, matriz))
         if(metodos.obtenerValorPosicion(posicion, matriz)==3 || metodos.obtenerValorPosicion(posicion, matriz)==4 || metodos.obtenerValorPosicion(posicion, matriz)==5)
-          metodos.insertarPosicion(-1, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
+          metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
         else if(metodos.obtenerValorPosicion(posicion, matriz)==0)
           metodos.insertarPosicion(0, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
         else
@@ -297,59 +304,52 @@ object Main {
   }
 
   // desintegracion de naves
-  def destruccionNaveDestructor(escenario:List[Int], numFilas:Int, numColumnas:Int, pos:Int):List[Int] ={
-
-    val fila = numFilas
-    val col = numColumnas
-
-    def destruccionDestructor(matriz:List[Int], col:Int, fila:Int, pos:Int, numero:Int, radio:Int, limite:Int):List[Int] ={
-      if(pos>=metodos.longitudLista(matriz, 0)) matriz
-      else if(metodos.obtenerValorPosicion(pos, matriz)!=1){
-        if(numero<limite && pos%col!=0 && limite==11) {
-          metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio, limite))
-        } else if(numero<limite && limite<11) {
-          metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio, limite))
-        } else if(numero<limite && limite==11 && numero<1) {
-          metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio, limite))
-        } else if(radio>=10) {
-          matriz
-        } else {
-          metodos.insertarPosicion(0, pos, destruccionDestructor(matriz, col, fila, (pos-numero)+col, 0, radio+1, limite))
-        }
-      }else {
-        metodos.insertarPosicion(1, pos, destruccionDestructor(matriz, col, fila, pos+1, numero+1, radio+1, limite))
+  def destruccionNaveDestructor(escenario :List[Int], numFilas :Int, numColumnas :Int, pos :Int):List[Int] = {
+    println("destruccion de destructor")
+    val radio = 5
+    val dimension = numFilas*numColumnas
+    def buscarPosIni(posAux :Int, contador :Int):(Int,Int) = {
+      if(posAux%numColumnas !=0 && contador <5){
+        buscarPosIni(posAux-1,contador+1)
+      }else{
+        return (posAux-numColumnas*5,contador)
       }
     }
-
-    val esc = if(pos%col==0){
-      println("aaaaaaaaaaaaaaaaaaaaaaaaaa")
-      destruccionDestructor(escenario, col, fila, (pos)-col*5, 0, 0, 6)
-    }else if(pos%col==1){
-      println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
-      destruccionDestructor(escenario, col, fila, (pos-1)-col*5, 0, 0, 7)
-    }else if(pos%col==2){
-      println("ccccccccccccccccccccccccccccc")
-      destruccionDestructor(escenario, col, fila, (pos-2)-col*5, 0, 0, 8)
-    }else if(pos%col==3){
-      println("dddddddddddddddddddddddd")
-      destruccionDestructor(escenario, col, fila, (pos-3)-col*5, 0, 0, 9)
-    }else if(pos%col==4){
-      println("eeeeeeeeeeeeeeeeeeeeeeeeeeee")
-      destruccionDestructor(escenario, col, fila, (pos-4)-col*5, 0, 0, 10)
-    }else if(pos%col==5){
-      println("eeeeeeeeeeeeeeeeeeeeeeeeeeee")
-      destruccionDestructor(escenario, col, fila, (pos-5)-col*5, 0, 0, 11)
+    val (posInicial,cont) = buscarPosIni(pos,0)
+    def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, posInicialAux :Int, contadorH :Int, contadorV :Int): List[Int] ={
+      if(posAux < dimension && contadorV < radio*2){
+        val valor = metodos.obtenerValorPosicion(posAux, escenarioAux)
+        def restricciones(escenarioRes :List[Int]):List[Int] = {
+          if( valor == 1 || valor == 2 || valor == -5){
+            if (valor == 1){
+              return metodos.insertarPosicion(-5, posAux, escenarioRes)
+            }else{
+              return escenarioRes
+            }
+          }else{
+            return metodos.insertarPosicion(0, posAux, escenarioRes)
+          }
+        }
+        val escenarioNuevo = restricciones(escenarioAux)
+        if((posAux+1)%numColumnas == 0 || contadorH >= radio*2-5+cont){
+          val posInicialAuxNueva = posInicialAux+numColumnas
+          val posAuxNueva = posInicialAuxNueva
+          aplicarDestruccion(escenarioNuevo, posAuxNueva, posInicialAuxNueva, 0, contadorV+1)
+        }else{
+          val posAuxNueva = posAux+1
+          aplicarDestruccion(escenarioNuevo, posAuxNueva, posInicialAux, contadorH+1, contadorV)
+        }
+      }else{
+        return escenarioAux
+      }
     }
-    else{
-      println("11111111111111111111111111111")
-      destruccionDestructor(escenario, col, fila, (pos-5)-col*5, 0, 0, 11)
-    }
-
-    return esc
+    return aplicarDestruccion(escenario, posInicial, posInicial, 0, 0)
   }
 
 
+
   def destruccionHorizontal(escenario: List[Int], numColumnas: Int, numFilas: Int, pos: Int):List[Int] = {
+    println("destruccion de crucero")
     val dimension = numFilas*numColumnas
 
     def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, mov :Int):List[Int] = {
@@ -379,6 +379,7 @@ object Main {
   }
 
   def destruccionVertical(escenario: List[Int], numColumnas: Int, numFilas: Int, pos: Int):List[Int] = {
+    println("destruccion de crucero")
     val dimension = numFilas*numColumnas
     def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, mov :Int):List[Int] = {
       if( posAux >0 && posAux < dimension){
@@ -416,8 +417,7 @@ object Main {
               valor match {
                 case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, numColumnas, numFilas, pos)
                 case `destruccionCruceroVertical` => destruccionVertical(escenarioAux, numColumnas, numFilas, pos)
-                case  `destruccionDestructor` => {println(pos)
-                  destruccionNaveDestructor(escenarioAux, numColumnas, numFilas, pos)}
+                case  `destruccionDestructor` => metodos.insertarPosicion(`muro`,pos,destruccionNaveDestructor(escenarioAux, numColumnas, numFilas, pos))
                 case _ => escenarioAux
               }
             }
@@ -425,7 +425,6 @@ object Main {
           }
           // desintegracion en la tierra
           else if (fila == numFilas-1){
-            println(s"valor = $valor")
             valor match{
               case `destruccionDestructor` => destruccionNaveDestructor(escenarioAux, numFilas, numColumnas, pos)
               case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, numColumnas, numFilas, pos)
@@ -469,10 +468,127 @@ object Main {
     }
     val (escenarioNuevo1,vidasNuevas) = buscarJugador(escenarioNuevo,numColumnas*numFilas-numColumnas)
     // Puntuaciones
-
-    return (escenarioNuevo1, puntuacion, vidasNuevas)
+    def incrementarPuntuacion(escenarioAux1 :List[Int], posIn1 :Int, contador :Int, contadorVidas :Int):(Int,Int) = {
+      if(posIn1 < dimension) {
+        val valor = metodos.obtenerValorPosicion(posIn1, escenarioAux1)
+        valor match {
+          case `destruccionAlien` =>  incrementarPuntuacion(escenarioAux1 , posIn1+1 , contador + 5, contadorVidas )
+          case `destruccionNube` =>  incrementarPuntuacion(escenarioAux1 , posIn1+1 , contador + 25 , contadorVidas)
+          case `destruccionCefalopodo` =>incrementarPuntuacion(escenarioAux1 , posIn1+1 , contador + 15, contadorVidas )
+          case `destruccionDestructor` =>incrementarPuntuacion(escenarioAux1 , posIn1+1 , contador + 5, contadorVidas )
+          case `destruccionCruceroVertical` => incrementarPuntuacion(escenarioAux1 , posIn1+1 , contador + 13, contadorVidas )
+          case `destruccionCruceroHorizontal` => incrementarPuntuacion(escenarioAux1 , posIn1+1 , contador + 13, contadorVidas )
+          case `destruccionComandante` => incrementarPuntuacion(escenarioAux1 , posIn1+1 , contador + 100, contadorVidas+1 )
+          case _ => incrementarPuntuacion(escenarioAux1 , posIn1+1 , contador, contadorVidas)
+        }
+      }else{
+        return (contador, contadorVidas)
+      }
+    }
+    val (puntos, vidasNuevas1) = incrementarPuntuacion(escenarioNuevo1,numColumnas*numFilas-numColumnas, puntuacion, vidasNuevas)
+    println(s"puntos = $puntos")
+    return (escenarioNuevo1, puntos, vidasNuevas1)
   }
   // generacion de naves
+
+
+  // pilotoAutomatico
+
+  def eleccionCamino( izq :Int, der :Int, pos :Int, numFilas :Int, numColumnas :Int):Int = {
+    if (izq == der){
+      // buscamos el centro
+      if(numFilas*numColumnas-numColumnas/2-1<pos){
+        return 1
+      }else{
+        return 2
+      }
+    }
+    else if( izq < der){
+      if(pos-1 < numFilas*numColumnas-numColumnas){
+        //fuera de linea
+        return 2
+      }else{
+        return 1
+      }
+    }else{
+      if( pos+1 > numFilas*numColumnas-1){
+        //fuera de linea
+        return 1
+      }else{
+        return 2
+      }
+    }
+
+  }
+
+  def descensoAuxiliar(matriz: List[Int], fila: Int, col: Int): List[Int] = {
+    val nuevaMatriz = metodos.InicializarLista(fila * col)
+    def recorrerMatriz(posicion :Int, m :List[Int]):List[Int] = {
+      if( posicion < fila*col-col){
+        if(metodos.obtenerValorPosicion(posicion,matriz) != 2 ){
+          return recorrerMatriz(posicion+1,metodos.insertarPosicion(metodos.obtenerValorPosicion(posicion,matriz), posicion+col, m))
+        }else{
+          val mNueva = metodos.insertarPosicion(2, posicion, m)
+          return recorrerMatriz(posicion+1,mNueva)
+        }
+      }else{
+        return m
+      }
+    }
+    return recorrerMatriz(0, nuevaMatriz)
+  }
+
+  def pilotoAutomatico( escenario :List[Int], numColumnas :Int, numFilas :Int, posJugador :Int):Char = {
+    def movimiento(escenarioAux :List[Int], pos :Int, contador :Int):(Int,List[Int]) = {
+      if ( contador < 5 && pos < numColumnas*numFilas && pos > numColumnas*numFilas-numColumnas-1){
+        val valor = metodos.obtenerValorPosicion(pos, escenarioAux)
+        val escenarioNuevo = descensoAuxiliar(escenarioAux, numFilas, numColumnas)
+        def impactado():Int = {
+          if( valor != 0){
+            return 1
+          }else{
+            return 0
+          }
+        }
+        val (izq, elec1) = movimiento(escenarioNuevo, pos-1, contador+1)
+        val (der, elec2) = movimiento(escenarioNuevo, pos+1, contador+1)
+        val izqAux = izq+impactado()
+        val derAux = der+impactado()
+        val eleccion = eleccionCamino(izqAux,derAux, pos, numFilas, numColumnas)
+        def funcionAux():List[Int] = {
+          if (eleccion <2){
+            return elec1
+          }else{
+            return elec2
+          }
+        }
+        def impactosAnteriores():Int = {
+          if(eleccion <2){
+            return izqAux
+          }else{
+            return derAux
+          }
+        }
+        return (impactosAnteriores(),eleccion::funcionAux())
+      }else{
+        return (0,List())
+      }
+    }
+    val (nImpactos, eleccion) = movimiento(escenario, posJugador,0 )
+    // el ultimo elemento de la lista es basura generada por la parada de recursion
+    val elecciones = metodos.eliminarUltimo(eleccion)
+    def entradaFinal():Char = {
+      if (elecciones.head == 1){
+        return 'a'
+      }else{
+        return 'd'
+      }
+    }
+
+    return entradaFinal()
+
+  }
+
 
 
   def main(args: Array[String]): Unit = {
@@ -480,26 +596,17 @@ object Main {
     println(" - Dimensiones - ")
 
     // Obtener las dimensiones del escenario
-    val numFilas = 15
-    val numColumnas = 15
-    /*
-    val matrizPrueba: List[Int] = List(
-      0, 3, 0, 2, 0,
-      3, 3, 3, 0, 4,
-      0, 3, 6, 3, 0,
-      6, 0, 0, 8, 3,
-      0, 8, 0, 3, 0
-    )
-    */
+    val numFilas = 7
+    val numColumnas = 10
 
     //val (numFilas, numColumnas) = obtenerDimensionesMatriz()
     val dimension = numFilas*numColumnas
     println(s"Dimensiones del Escenario: $numFilas x $numColumnas")
     val escenarioVacio = metodos.InicializarLista(numFilas*numColumnas)
 
-    // Puntuación y vidas del usuario de prueba
-    val puntuacion: Int = 100
-    val vidas: Int = 3
+    // Puntuación y vidas
+    val puntuacion = 0
+    val vidas = 10
 
     // Generar muros y añadir usuario
     val escenarioInicial = generarMuros(escenarioVacio, numFilas, numColumnas, dimension)
@@ -522,84 +629,80 @@ object Main {
 
     val modoejecucion = modo()
     // Movimiento y ejecucion del juego
-    def movimiento(posicion: Int, escenario: List[Int], vidasJugador :Int): Unit = {
-      if( modoejecucion == 1) {println(" mover jugador: ") }
-      def valentrada():Char = {
+    def movimiento(posicion: Int, escenario: List[Int], vidasJugador :Int, puntuacionJugador :Int): Unit = {
+      if(vidasJugador >0) {
         if (modoejecucion == 1) {
-          return StdIn.readChar() // entrada de teclado para el movimiento
-        } else {
-          if (metodos.randomFunction > 0.5) {
-            if (posicion-1 > (numColumnas*numFilas - 1) || posicion-1 < numColumnas*(numFilas-1)) {
-              return valentrada()
-            }else {
-              Thread.sleep(1500)
-              return 'a'
-            }
+          println(" mover jugador: ")
+        }
+        def valentrada(): Char = {
+          if (modoejecucion == 1) {
+            return StdIn.readChar() // entrada de teclado para el movimiento
+          } else {
+            Thread.sleep(1500)
+            return pilotoAutomatico(escenario, numColumnas, numFilas, posicion)
+          }
 
-          } else {
-            if (posicion+1 > (numColumnas*numFilas - 1) || posicion+1 < numColumnas*(numFilas-1)) {
-              return valentrada()
-            }else {
-              Thread.sleep(1500)
-              return 'd'
+
+        }
+
+        val entrada = valentrada()
+        entrada match {
+          case 'a' => {
+            if (posicion - 1 > (numColumnas * numFilas - 1) || posicion - 1 < numColumnas * (numFilas - 1)) {
+              println("Movimiento no válido")
+              movimiento(posicion, escenario, vidasJugador, puntuacionJugador)
+            } else {
+              // actualizar posicion usuario
+              val escenarioAux = metodos.insertarPosicion(0, posicion, escenario) // la posicion actual se vuelve vacia
+              val escenarioAux1 = metodos.insertarPosicion(1, posicion - 1, escenarioAux) // la nueva posicion contiene al jugador
+              // actualizarEscenario
+              // reconversionNaves
+              val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
+              //descensoNaves
+              val escenarioNuevo1 = desciendeNaves(escenarioNuevo, numColumnas, numFilas)
+              //desintegracionNaves
+              val (escenarioNuevo2, puntuacionNueva, vidasNueva) = desintegracionNaves(escenarioNuevo1, numFilas, numColumnas, puntuacionJugador, vidasJugador)
+              //generacionNaves
+              val tablero = metodos.rellenar(escenarioNuevo2, numColumnas, numFilas, numFilas * numColumnas)
+              // Imprimir el escenario actualizado
+              imprimirEscenario(tablero, numFilas, numColumnas, puntuacionNueva, vidasNueva)
+              movimiento(posicion - 1, tablero, vidasNueva, puntuacionNueva)
             }
           }
-        }
-      }
-      val entrada = valentrada()
-      entrada match {
-        case 'a' => {
-          if (posicion-1 > (numColumnas*numFilas - 1) || posicion-1 < numColumnas*(numFilas-1)) {
+          case 'd' => {
+            if (posicion + 1 > (numColumnas * numFilas - 1) || posicion + 1 < numColumnas * (numFilas - 1)) {
+              println("Movimiento no válido")
+              movimiento(posicion, escenario, vidasJugador, puntuacionJugador)
+            } else {
+              // actualizar posicion usuario
+              val escenarioAux = metodos.insertarPosicion(0, posicion, escenario) // la posicion actual se vuelve vacia
+              val escenarioAux1 = metodos.insertarPosicion(1, posicion + 1, escenarioAux) // la nueva posicion contiene al jugador
+              // actualizarEscenario
+              // reconversionNaves
+              val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
+              //descensoNaves
+              val escenarioNuevo1 = desciendeNaves(escenarioNuevo, numColumnas, numFilas)
+              //desintegracionNaves
+              val (escenarioNuevo2, puntuacionNueva, vidasNueva) = desintegracionNaves(escenarioNuevo1, numFilas, numColumnas, puntuacionJugador, vidasJugador)
+              //generacionNaves
+              val tablero = metodos.rellenar(escenarioNuevo2, numColumnas, numFilas, numFilas * numColumnas)
+              // Imprimir el escenario actualizado
+              imprimirEscenario(tablero, numFilas, numColumnas, puntuacionNueva, vidasNueva)
+              movimiento(posicion + 1, tablero, vidasNueva, puntuacionNueva)
+            }
+          }
+          case _ => {
             println("Movimiento no válido")
-            movimiento(posicion, escenario, vidasJugador)
-          } else {
-            // actualizar posicion usuario
-            val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
-            val escenarioAux1 = metodos.insertarPosicion(1,posicion-1, escenarioAux) // la nueva posicion contiene al jugador
-            // actualizarEscenario
-            // reconversionNaves
-            val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
-            //descensoNaves
-            val escenarioNuevo1 = desciendeNaves(escenarioNuevo, numColumnas, numFilas)
-            //desintegracionNaves
-            val (escenarioNuevo2, puntuacionNueva, vidasNueva) = desintegracionNaves(escenarioNuevo1, numFilas, numColumnas, puntuacion, vidasJugador)
-            //generacionNaves
-            val tablero = metodos.rellenar(escenarioNuevo2, numColumnas, numFilas, numFilas*numColumnas)
-            // Imprimir el escenario actualizado
-            imprimirEscenario(tablero, numFilas, numColumnas, puntuacion, vidasNueva)
-            movimiento(posicion-1, tablero, vidasNueva)
+            movimiento(posicion, escenario, vidasJugador, puntuacionJugador)
           }
         }
-        case 'd' => {
-          if (posicion+1 > (numColumnas*numFilas - 1) || posicion+1 < numColumnas*(numFilas-1)) {
-            println("Movimiento no válido")
-            movimiento(posicion, escenario, vidasJugador)
-          } else {
-            // actualizar posicion usuario
-            val escenarioAux = metodos.insertarPosicion(0,posicion,escenario) // la posicion actual se vuelve vacia
-            val escenarioAux1 = metodos.insertarPosicion(1,posicion+1, escenarioAux) // la nueva posicion contiene al jugador
-            // actualizarEscenario
-            // reconversionNaves
-            val escenarioNuevo = reconversionNaves(escenarioAux1, numFilas, numColumnas)
-            //descensoNaves
-            val escenarioNuevo1 = desciendeNaves(escenarioNuevo, numColumnas, numFilas)
-            //desintegracionNaves
-            val (escenarioNuevo2, puntuacionNueva, vidasNueva) = desintegracionNaves(escenarioNuevo1, numFilas, numColumnas, puntuacion, vidasJugador)
-            //generacionNaves
-            val tablero = metodos.rellenar(escenarioNuevo2, numColumnas, numFilas, numFilas*numColumnas)
-            // Imprimir el escenario actualizado
-            imprimirEscenario(tablero, numFilas, numColumnas, puntuacion, vidasNueva)
-            movimiento(posicion+1, tablero, vidasNueva)
-          }
-        }
-        case _   => {
-          println("Movimiento no válido")
-          movimiento(posicion, escenario, vidasJugador)
-        }
+      }else{
+        println("--FIN DEL JUEGO--")
       }
+
     }
     // ejecutar el movimiento
     val pos = ((numColumnas/2)+(numFilas-1)*numColumnas)
-    movimiento(pos, escenarioInicial, vidas)
+    movimiento(pos, escenarioInicial, vidas, puntuacion)
   }
 }
