@@ -468,7 +468,7 @@ object Main {
               valor match {
                 case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, numColumnas, numFilas, pos)
                 case `destruccionCruceroVertical` => destruccionVertical(escenarioAux, numColumnas, numFilas, pos)
-                case  `destruccionDestructor` => metodos.insertarPosicion(`muro`,pos,destruccionNaveDestructor(escenarioAux, numColumnas, numFilas, pos))
+                case  `destruccionDestructor` => metodos.insertarPosicion(`muro`,pos,destruccionNaveDestructor(escenarioAux, numFilas, numColumnas, pos))
                 case _ => escenarioAux
               }
             }
@@ -705,18 +705,18 @@ object Main {
     imprimirEscenario(escenarioInicial, numFilas, numColumnas, puntuacion, vidas)
 
     def modo():Int = {
-      println("---MODO DE EJECUCION---")
-      println("1 - modo manual")
-      println("2 - modo automatico")
       val m = StdIn.readInt()
-
-      if(m != 1 && m != 2){
-        println("No se ha introducido un modo correcto, introduzca de nuevo")
-        return modo()
+      m match {
+        case 1 | 2 => m
+        case _ => {
+          println("No se ha introducido un modo correcto, introduzca de nuevo")
+          modo()
+        }
       }
-      return m
     }
-
+    println("---MODO DE EJECUCION---")
+    println("1 - modo manual")
+    println("2 - modo automatico")
     val modoejecucion = modo()
     // Movimiento y ejecucion del juego
     def movimiento(posicion: Int, escenario: List[Int], vidasJugador :Int, puntuacionJugador :Int): Unit = {
