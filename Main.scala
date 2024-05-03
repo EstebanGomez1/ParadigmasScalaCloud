@@ -1,4 +1,3 @@
-import scala.math._
 
 object Constants {
   val vacio: Int = 0
@@ -10,7 +9,6 @@ object Constants {
   val destructor: Int = 6
   val crucero: Int = 7
   val comandante: Int = 8
-  val destruccion = -1
   val destruccionCruceroHorizontal = -2
   val destruccionCruceroVertical = -6
   val destruccionComandante = -3
@@ -24,13 +22,16 @@ object Constants {
 object Main {
   import Auxiliar.Metodos
   import Constants._
-
   import scala.io.StdIn
+  import java.util.Random
 
-  val metodos:  Metodos = new Metodos
+  val metodos:  Metodos = new Metodos // funciones auxiliares para el manejo de listas, numeros aleatorios y operaciones.
 
   // Pedir datos al usuario
   def obtenerDimensionesMatriz(): (Int, Int) = {
+    /*
+    @descripcion obtenerDimensionesMatriz: Pide al usuario las dimensiones del escenario de juego.
+    */
     try {
       // Pedir al usuario que introduzca el valor de la fila
       print("Introduce el numero de filas: ")
@@ -63,38 +64,52 @@ object Main {
 
   // Imprimir por pantalla
   /*
-    @descripcion printEscenario: imprime una version con formato del escenario de juego.
-    @param matriz: puntero a matriz escenario.
+    @descripcion
+    @param
+    @param
+    @param
+    */
+  def imprimirFilaEscenario(matrix: List[Int], i: Int, n: Int, m: Int, vidas: Int, j: Int = 0): Unit = {
+    /*
+    @descripcion imprimirFilaEscenario: imprime una version con formato del escenario de juego.
+    @param matrix: matriz escenario.
+    @param i: contador con el fin de parar la recursion.
     @param n: numero establecido de filas.
     @param m: numero establecido de columnas.
     @param puntuacion: contiene el valor de la puntuacion del usuario.
     @param vidas: contiene el valor de las vidas del usuario.
     */
-  def imprimirFilaEscenario(matrix: List[Int], i: Int, n: Int, m: Int, vidas: Int, j: Int = 0): Unit = {
+    val color_RESET = "\u001B[0m"
+    val color_RED = "\u001B[31m"
+    val color_GREEN = "\u001B[32m"
+    val color_YELLOW = "\u001B[33m"
+    val color_brillante_GREEN = "\u001B[92m"
+    val color_BLUE = "\u001B[34m"
+    val color_PURPLE = "\u001B[35m"
+    val color_CYAN = "\u001B[36m"
+    val color_WHITE = "\u001B[37m"
     if (i < n) {
-
-
-      if (j < matrix.length) {
-        val valor = matrix(j)
+      if (j < metodos.longitudLista(matrix,0)) {
+        val valor = metodos.obtenerValorPosicion(j, matrix)
         val symbol = valor match {
           case `vacio` => "   "
-          case `jugador` => if (vidas == 0) " . " else " W "
-          case `muro` => " B "
-          case `alien` => " A "
-          case `nube` => " N "
-          case `cefalopodo` => " C "
-          case `destructor` => " D "
-          case `crucero` => " R "
-          case `comandante` => " X "
+          case `jugador` => if (vidas == 0) color_RED + " . " + color_RESET else color_BLUE + " W " + color_RESET
+          case `muro` => color_CYAN +" B "+ color_RESET
+          case `alien` => color_GREEN +" A " + color_RESET
+          case `nube` => color_brillante_GREEN + " N " + color_RESET
+          case `cefalopodo` => color_PURPLE +" C " + color_RESET
+          case `destructor` => color_YELLOW + " D " + color_RESET
+          case `crucero` => color_RED + " R " + color_RESET
+          case `comandante` => color_WHITE + " X " + color_RESET
           //case _ => " " + valor + " "
           case _ => "   "
         }
         print(symbol)
-        if (j == matrix.length - 1){
+        if (j == metodos.longitudLista(matrix,0) - 1){
           print("|")
           println()
         }
-        if ((j + 1) % m == 0 && j != matrix.length - 1) {
+        if ((j + 1) % m == 0 && j != metodos.longitudLista(matrix,0) - 1) {
           print("|")
           println()
           print("  |")
@@ -106,10 +121,14 @@ object Main {
     }
   }
 
-  def imprimirLineaSuperior(m: Int, current: Int = 0): Unit = {
+  def imprimirBorde(m: Int, current: Int = 0): Unit = {
+    /*
+    @descripcion imprimirLineaSuperior: imprime los bordes superior e inferior del tablero.
+    @param m: numero de columnas.
+    */
     if (current < m) {
       print("---")
-      imprimirLineaSuperior(m, current + 1)
+      imprimirBorde(m, current + 1)
     } else {
       print("+")
       println()
@@ -117,16 +136,24 @@ object Main {
   }
 
   def imprimirEscenario(matrix: List[Int], n: Int, m: Int, puntuacion: Int, vidas: Int): Unit = {
+    /*
+    @descripcion imprimirEscenario: imprime una version con formato del escenario.
+    @param matrix: matriz escenario.
+    @param n: numero establecido de filas.
+    @param m: numero establecido de columnas.
+    @param puntuacion: contiene el valor de la puntuacion del usuario.
+    @param vidas: contiene el valor de las vidas del usuario.
+    */
     println("\n     -- Escenario -- ")
     // parte superior del escenario
     print("  +")
-    imprimirLineaSuperior(m)
+    imprimirBorde(m)
     // contenido del escenario
     print("  |")
     imprimirFilaEscenario(matrix, 0, n, m, vidas)
     // parte inferior del escenario
     print("  +")
-    imprimirLineaSuperior(m)
+    imprimirBorde(m)
     // imprimimos la puntuación y vidas del usuario
     println(s"\n  < Puntuacion: $puntuacion > < vidas: $vidas >")
   }
@@ -245,6 +272,7 @@ object Main {
     return buscarReconversion(escenario, posInicial, filaInicial, colInicial)
 
   }
+
   // Descenso de naves
   def desciendeNaves(matriz:List[Int], fila:Int, col:Int):List[Int] = {
 
@@ -305,6 +333,12 @@ object Main {
 
   // desintegracion de naves
   def destruccionNaveDestructor(escenario :List[Int], numFilas :Int, numColumnas :Int, pos :Int):List[Int] = {
+    /*
+    @descripcion destruccionNaveDestructor: esta funcion genera la explosion de radio 5 casillas del destructor cuando impacta contra la tierra o con un muro.
+    @param numFilas: numero de filas.
+    @param numColumnas: numero de columnas.
+    @param pos: posicion del jugador.
+    */
     println("destruccion de destructor")
     val radio = 5
     val dimension = numFilas*numColumnas
@@ -346,9 +380,13 @@ object Main {
     return aplicarDestruccion(escenario, posInicial, posInicial, 0, 0)
   }
 
-
-
   def destruccionHorizontal(escenario: List[Int], numColumnas: Int, numFilas: Int, pos: Int):List[Int] = {
+    /*
+    @descripcion destruccionHorizontal: genera la desruccion del crucero en su formato horizontal, arrasando con las casillas de esa fila.
+    @param numFilas: numero de filas.
+    @param numColumnas: numero de columnas.
+    @param pos: posicion del jugador.
+    */
     println("destruccion de crucero")
     val dimension = numFilas*numColumnas
 
@@ -379,6 +417,12 @@ object Main {
   }
 
   def destruccionVertical(escenario: List[Int], numColumnas: Int, numFilas: Int, pos: Int):List[Int] = {
+    /*
+    @descripcion destruccionHorizontal: genera la desruccion del crucero en su formato vertical, arrasando con las casillas de esa columna.
+    @param numFilas: numero de filas.
+    @param numColumnas: numero de columnas.
+    @param pos: posicion del jugador.
+    */
     println("destruccion de crucero")
     val dimension = numFilas*numColumnas
     def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, mov :Int):List[Int] = {
@@ -403,6 +447,13 @@ object Main {
   }
 
   def desintegracionNaves(escenario :List[Int], numFilas :Int, numColumnas :Int, puntuacion :Int, vidas :Int):(List[Int], Int, Int) = {
+    /*
+    @descripcion desintegracionNaves: modifica el escenario de acuerdo a las naves que explotan o se estrellan contra la tierra
+    @param numFilas: numero de filas.
+    @param numColumnas: numero de columnas.
+    @param puntuacion: puntuacion del juego que tiene el jugador en el instante de llamada a esta funcion.
+    @param vidas: cantidad de vidas que tiene el usuario en el momento de llamada a esta funcion.
+    */
     val filaInicial = 0
     val colInicial = 0
     val posInicial = 0
@@ -486,15 +537,39 @@ object Main {
       }
     }
     val (puntos, vidasNuevas1) = incrementarPuntuacion(escenarioNuevo1,numColumnas*numFilas-numColumnas, puntuacion, vidasNuevas)
-    println(s"puntos = $puntos")
     return (escenarioNuevo1, puntos, vidasNuevas1)
   }
   // generacion de naves
 
+  def randomAlien(): Int ={
+    val random = new Random()
+    val randN = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
+    if (randN <= 0.4) 3
+    else if (randN>0.4 && randN<=0.65) 4
+    else if (randN>0.65 && randN<=0.8) 5
+    else if (randN>0.8 && randN<=0.85) 6
+    else if (randN>0.85 && randN<=0.98) 7
+    else 8
+  }
+
+  def generarNaves(matriz:List[Int], col:Int, fila:Int, dimension:Int):List[Int]=
+    dimension match{
+      case 0 => Nil
+      case d if d>(fila*col)-col => randomAlien()::generarNaves(matriz.tail, col, fila, dimension-1)
+      case _ => matriz.head::generarNaves(matriz.tail, col, fila, dimension-1)
+    }
 
   // pilotoAutomatico
 
   def eleccionCamino( izq :Int, der :Int, pos :Int, numFilas :Int, numColumnas :Int):Int = {
+    /*
+    @descripcion eleccionCamino: permite elegir el siguiente paso que dara el jugador en el modo piloto automatico en base a unas condiciones.
+    @param izq: valor numerico de impactos si damos un paso a la izquierda.
+    @param der: valor numerico de impactos si damos un paso a la derecha.
+    @param pos: posicion del jugador en el escenario.
+    @param numFilas: numero de filas.
+    @param numColumnas: numero de columnas.
+    */
     if (izq == der){
       // buscamos el centro
       if(numFilas*numColumnas-numColumnas/2-1<pos){
@@ -522,6 +597,11 @@ object Main {
   }
 
   def descensoAuxiliar(matriz: List[Int], fila: Int, col: Int): List[Int] = {
+    /*
+    @descripcion descensoAuxiliar: simulacion del descenso de naves en el escenario.
+    @param fila: numero de filas.
+    @param col: numero de columnas.
+    */
     val nuevaMatriz = metodos.InicializarLista(fila * col)
     def recorrerMatriz(posicion :Int, m :List[Int]):List[Int] = {
       if( posicion < fila*col-col){
@@ -539,6 +619,17 @@ object Main {
   }
 
   def pilotoAutomatico( escenario :List[Int], numColumnas :Int, numFilas :Int, posJugador :Int):Char = {
+    /*
+    @descripcion pilotoAutomatico: generacion del mejor camino posible en base a la simulacion del descenso de naves.
+                                   Mediante la busqueda en el arbol de aridad 2 generado erecursivamente ( cada nodo tiene dos hijos izquierda y derecha)
+                                   Minimiza el numero de impactos por naves alienigenas durante la simulacion del descenso de naves.
+                                   EL resultado es un camino que contiene los pasos (izq o der) que debe dar el jugador para evitar ser impactado.
+                                   Finalmente se tendra en cuenta solo el primer paso, pero la eleccion de este primer paso es realizada en base a los demas pasos dados.
+                                   La profundidad del arbol es de 5, que comprende los suficientes movimientos para evitar naves a la altura de los muros.
+    @param pos: posicion del jugador en el escenario.
+    @param numFilas: numero de filas.
+    @param numColumnas: numero de columnas.
+    */
     def movimiento(escenarioAux :List[Int], pos :Int, contador :Int):(Int,List[Int]) = {
       if ( contador < 5 && pos < numColumnas*numFilas && pos > numColumnas*numFilas-numColumnas-1){
         val valor = metodos.obtenerValorPosicion(pos, escenarioAux)
@@ -596,10 +687,9 @@ object Main {
     println(" - Dimensiones - ")
 
     // Obtener las dimensiones del escenario
-    val numFilas = 7
-    val numColumnas = 10
 
-    //val (numFilas, numColumnas) = obtenerDimensionesMatriz()
+
+    val (numFilas, numColumnas) = obtenerDimensionesMatriz()
     val dimension = numFilas*numColumnas
     println(s"Dimensiones del Escenario: $numFilas x $numColumnas")
     val escenarioVacio = metodos.InicializarLista(numFilas*numColumnas)
@@ -619,11 +709,11 @@ object Main {
       println("1 - modo manual")
       println("2 - modo automatico")
       val m = StdIn.readInt()
-      /*
-      if(m != 1 || m != 2){
+
+      if(m != 1 && m != 2){
         println("No se ha introducido un modo correcto, introduzca de nuevo")
         return modo()
-      }*/
+      }
       return m
     }
 
@@ -663,7 +753,7 @@ object Main {
               //desintegracionNaves
               val (escenarioNuevo2, puntuacionNueva, vidasNueva) = desintegracionNaves(escenarioNuevo1, numFilas, numColumnas, puntuacionJugador, vidasJugador)
               //generacionNaves
-              val tablero = metodos.rellenar(escenarioNuevo2, numColumnas, numFilas, numFilas * numColumnas)
+              val tablero = generarNaves(escenarioNuevo2, numColumnas, numFilas, numFilas * numColumnas)
               // Imprimir el escenario actualizado
               imprimirEscenario(tablero, numFilas, numColumnas, puntuacionNueva, vidasNueva)
               movimiento(posicion - 1, tablero, vidasNueva, puntuacionNueva)
@@ -685,7 +775,7 @@ object Main {
               //desintegracionNaves
               val (escenarioNuevo2, puntuacionNueva, vidasNueva) = desintegracionNaves(escenarioNuevo1, numFilas, numColumnas, puntuacionJugador, vidasJugador)
               //generacionNaves
-              val tablero = metodos.rellenar(escenarioNuevo2, numColumnas, numFilas, numFilas * numColumnas)
+              val tablero = generarNaves(escenarioNuevo2, numColumnas, numFilas, numFilas * numColumnas)
               // Imprimir el escenario actualizado
               imprimirEscenario(tablero, numFilas, numColumnas, puntuacionNueva, vidasNueva)
               movimiento(posicion + 1, tablero, vidasNueva, puntuacionNueva)
