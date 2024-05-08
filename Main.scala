@@ -63,7 +63,7 @@ object Main {
   }
 
   // Imprimir por pantalla
-  /*
+    /*
     @descripcion
     @param
     @param
@@ -79,6 +79,7 @@ object Main {
     @param puntuacion: contiene el valor de la puntuacion del usuario.
     @param vidas: contiene el valor de las vidas del usuario.
     */
+    // colores variados
     val color_RESET = "\u001B[0m"
     val color_RED = "\u001B[31m"
     val color_GREEN = "\u001B[32m"
@@ -88,8 +89,11 @@ object Main {
     val color_PURPLE = "\u001B[35m"
     val color_CYAN = "\u001B[36m"
     val color_WHITE = "\u001B[37m"
+    // si el contador es menor que el numero de filas
     if (i < n) {
+      // si el contador es menor que la longitud del escenario
       if (j < metodos.longitudLista(matrix,0)) {
+        // asignacion de los valores de las naves
         val valor = metodos.obtenerValorPosicion(j, matrix)
         val symbol = valor match {
           case `vacio` => "   "
@@ -105,6 +109,7 @@ object Main {
           case _ => "   "
         }
         print(symbol)
+        //bordes y recursividad
         if (j == metodos.longitudLista(matrix,0) - 1){
           print("|")
           println()
@@ -159,28 +164,35 @@ object Main {
   }
 
   //Muros
-  def listaBloques(col:Int):List[Int] =
+  def listaBloques(col:Int):List[Int] = {
+    // lista auxiliar que contien los valores de la fila de muros con los posibles muros
     col match{
       case 0 => Nil
       case _ => metodos.randomFunction()::listaBloques(col-1)
     }
+  }
 
-  def revisar(col:Int, lista:List[Int], long:Int):List[Int] =
+  def revisar(col:Int, lista:List[Int], long:Int):List[Int] = {
+    // comprobacion y rectificacion si los muros cumplen su condicion de no mas de 3 juntos
     lista match{
       case Nil => Nil
       case l if long>=3 => 0::revisar(col-1,lista.tail, long-3)
       case l if lista.head==2 => lista.head::revisar(col-1, lista.tail, long+1)
       case _ => lista.head::revisar(col-1, lista.tail, long=0)
     }
+  }
 
-  def modificacion(lista:List[Int], lBlq:List[Int], fila:Int, col:Int, dimension:Int):List[Int] =
+  def modificacion(lista:List[Int], lBlq:List[Int], fila:Int, col:Int, dimension:Int):List[Int] = {
+    // en el caso de que haya mas de 3 juntos hacemos los cambios pertinentes
     dimension match{
       case 0 => Nil
       case d if d<=5*col && d>4*col => lBlq.head::modificacion(lista.tail, lBlq.tail, fila, col, dimension-1)
       case _ =>  lista.head::modificacion(lista.tail, lBlq, fila, col, dimension-1)
     }
+  }
 
   def generarMuros(escenario: List[Int], numFilas: Int, numColumnas: Int, dimension: Int): List[Int]= {
+    // funcion principal para generar muros
     val listanueva = listaBloques(numColumnas)
     val revisada = revisar(numColumnas, listanueva, 0)
     val tablanueva = modificacion(escenario, revisada, numFilas, numColumnas, dimension)
@@ -200,7 +212,7 @@ object Main {
     val colInicial = 0
     val posInicial = 0
     val dimension = numFilas*numColumnas
-
+    // buscamos las posibles reconversiones usando funciones locales a modo de bucles
     def buscarReconversion(escenarioAux :List[Int], pos :Int, fila :Int, col: Int):List[Int] ={
 
       def aplicarReconversion():List[Int] = {
@@ -245,7 +257,10 @@ object Main {
         }
         return escenarioAux
       }
+      // obtenemos un nuevo escenario despues de aplicar las reconversiones
       val escenarioNuevo = aplicarReconversion()
+      // avanzamos una posicion en la lista para seguir buscamos, actualizando la fila y columna donde nos encontramos
+      // siempre y cuando no nos salgamos de los limites del escenario
       val posAux = pos+1
       def actualizarFilas( posAux :Int, fila :Int):  Int={
         if(posAux%numColumnas == 0){
@@ -263,6 +278,7 @@ object Main {
         }
       }
       val colAux = actualizarCol()
+      // si la posicion esta fuera de los limites ya hemos revisado todo el escenario
       if(posAux >= dimension){
         return escenarioNuevo
       }else {
@@ -275,9 +291,14 @@ object Main {
 
   // Descenso de naves
   def desciendeNaves(matriz:List[Int], fila:Int, col:Int):List[Int] = {
-
+    /*
+    @descripcion desciendeNaves: funcion que desciende una posicion todas la naves del escenario
+    @param matriz: el escenario
+    @param fila: el numero de filas
+    @param col: el numero de columnas
+    */
     val dimension = fila*col
-
+    // valores de las naves alienigenas
     def elemento(e:Int):Int ={
       if (e==7) {
         if (metodos.numeroAleatorio()<=0.5) return -2
@@ -290,7 +311,7 @@ object Main {
       else if(e==5) return -9
       else return -1
     }
-
+    // procedemos a descender las naves
     def descensoNaves(posicion: Int, matriz: List[Int], col: Int, fila: Int): List[Int] = {
       if (matriz==Nil || posicion >= metodos.longitudLista(matriz,0)) {
         matriz
@@ -340,8 +361,11 @@ object Main {
     @param pos: posicion del jugador.
     */
     println("destruccion de destructor")
+    // el radio de explision
     val radio = 5
     val dimension = numFilas*numColumnas
+    // buscamos la posicion en la que empezar a destruir
+    // el algoritmo situa la posicion en la esquina superior izquierda del cuadrado de elementos vacios que simularan la destruccion
     def buscarPosIni(posAux :Int, contador :Int):(Int,Int) = {
       if(posAux%numColumnas !=0 && contador <5){
         buscarPosIni(posAux-1,contador+1)
@@ -350,9 +374,11 @@ object Main {
       }
     }
     val (posInicial,cont) = buscarPosIni(pos,0)
+    // aplicamos la destruccion evitando desintegran los muros y destruyendo al jugador si esta en el radio de explosion
     def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, posInicialAux :Int, contadorH :Int, contadorV :Int): List[Int] ={
       if(posAux < dimension && contadorV < radio*2){
         val valor = metodos.obtenerValorPosicion(posAux, escenarioAux)
+        // en el caso de encontrarnos al jugador, muros o el jugador ya destruido
         def restricciones(escenarioRes :List[Int]):List[Int] = {
           if( valor == 1 || valor == 2 || valor == -5){
             if (valor == 1){
@@ -365,6 +391,7 @@ object Main {
           }
         }
         val escenarioNuevo = restricciones(escenarioAux)
+        // para el cuadrado de destruccion generado utilizamos un contado horizontal y otro vertical que usan el radio como medida
         if((posAux+1)%numColumnas == 0 || contadorH >= radio*2-5+cont){
           val posInicialAuxNueva = posInicialAux+numColumnas
           val posAuxNueva = posInicialAuxNueva
@@ -391,6 +418,7 @@ object Main {
     val dimension = numFilas*numColumnas
 
     def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, mov :Int):List[Int] = {
+      // funcion local que devuelve el escenario actualizado segun el valor encontrado, si encuentra un jugador este sera destruido, al igual que los muros
       def nuevoValor():List[Int] = {
         val valor = metodos.obtenerValorPosicion(posAux, escenarioAux)
         if( valor == 1 || valor ==`destruccionJugador` ){ // el jugador es afectado
@@ -399,6 +427,7 @@ object Main {
           return metodos.insertarPosicion(0, posAux, escenarioAux)
         }
       }
+      // evitamos salir de la fila que estamos destruyendo y aplicamos recursividad
       if( mov < 0 && posAux%numColumnas == 0){
         return nuevoValor()
       }else if (posAux%numColumnas != 0) {
@@ -411,7 +440,9 @@ object Main {
         return escenarioAux
       }
     }
+    // aplicamos la destruccion hacia la izquierda de la posicion del impacto de la nave
     val escenarioDestruido1 = aplicarDestruccion(escenario, pos, -1)
+    // aplicamos la destruccion hacia la derecha de la posicion del impacto de la nave
     val escenarioDestruido2 = aplicarDestruccion(escenarioDestruido1, pos, 1)
     return escenarioDestruido2
   }
@@ -425,6 +456,7 @@ object Main {
     */
     println("destruccion de crucero")
     val dimension = numFilas*numColumnas
+    // funcion local que devuelve el escenario actualizado segun el valor encontrado, si encuentra un jugador este sera destruido, al igual que los muros
     def aplicarDestruccion(escenarioAux :List[Int], posAux :Int, mov :Int):List[Int] = {
       if( posAux >0 && posAux < dimension){
         def nuevoValor():List[Int] = {
@@ -441,7 +473,9 @@ object Main {
         return escenarioAux
       }
     }
+    // aplicamos la destruccion hacia abajo de la posicion del impacto de la nave
     val escenarioDestruido1 = aplicarDestruccion(escenario, pos, -1)
+    // aplicamos la destruccion hacia la arriba de la posicion del impacto de la nave
     val escenarioDestruido2 = aplicarDestruccion(escenarioDestruido1, pos, 1)
     return escenarioDestruido2
   }
@@ -458,12 +492,15 @@ object Main {
     val colInicial = 0
     val posInicial = 0
     val dimension = numFilas*numColumnas
+    // recursividad para recorrer el escenario
     def recorrerEscenario(escenarioAux :List[Int], pos :Int, fila :Int, col :Int):List[Int] = {
       if (pos < dimension) {
-        // desintegracion en los muros
+
         val valor = metodos.obtenerValorPosicion(pos,escenarioAux)
         def aplicarDestrucciones():List[Int] = {
+          // desintegracion en los muros
           if(fila == numFilas-5 ){
+            // actualizamos el escenario si hay destrucciones
             def destruccionMuros():List[Int] = {
               valor match {
                 case `destruccionCruceroHorizontal` => destruccionHorizontal(escenarioAux, numColumnas, numFilas, pos)
@@ -506,6 +543,7 @@ object Main {
     val escenarioNuevo = recorrerEscenario(escenario, posInicial, filaInicial, colInicial)
     // vidas
     def buscarJugador(escenarioAux :List[Int], posIn :Int):(List[Int],Int) = {
+      // buscamos el jugador en la ultima fila y si esta destruido quitamos una vida e insertamos su valor normal de jugador
       if(posIn < dimension){
         val valor = metodos.obtenerValorPosicion(posIn, escenarioAux)
         if( valor == `destruccionJugador`){
@@ -520,6 +558,7 @@ object Main {
     val (escenarioNuevo1,vidasNuevas) = buscarJugador(escenarioNuevo,numColumnas*numFilas-numColumnas)
     // Puntuaciones
     def incrementarPuntuacion(escenarioAux1 :List[Int], posIn1 :Int, contador :Int, contadorVidas :Int):(Int,Int) = {
+      // las naves que hayan llegado a la ultima fila tendran su valor de destruccion, de este modo dependiendo de la nave destruida se sumara una puntuacion
       if(posIn1 < dimension) {
         val valor = metodos.obtenerValorPosicion(posIn1, escenarioAux1)
         valor match {
@@ -542,6 +581,7 @@ object Main {
   // generacion de naves
 
   def randomAlien(): Int ={
+    // esta funcion devuelve una nave alienigena distinta dependiendo de probabilidades
     val random = new Random()
     val randN = random.nextDouble() // Genera un número aleatorio entre 0.0 (inclusive) y 1.0 (exclusivo)
     if (randN <= 0.4) 3
@@ -552,24 +592,30 @@ object Main {
     else 8
   }
 
-  def generarNaves(matriz:List[Int], col:Int, fila:Int, dimension:Int):List[Int]=
+  def generarNaves(matriz:List[Int], col:Int, fila:Int, dimension:Int):List[Int]= {
+    // funcion para generar las naves alienigenas en la primera fila
     dimension match{
       case 0 => Nil
       case d if d>(fila*col)-col => randomAlien()::generarNaves(matriz.tail, col, fila, dimension-1)
       case _ => matriz.head::generarNaves(matriz.tail, col, fila, dimension-1)
     }
+  }
 
   // pilotoAutomatico
 
   def eleccionCamino( izq :Int, der :Int, pos :Int, numFilas :Int, numColumnas :Int):Int = {
     /*
-    @descripcion eleccionCamino: permite elegir el siguiente paso que dara el jugador en el modo piloto automatico en base a unas condiciones.
+    @descripcion eleccionCamino: permite elegir el siguiente paso que dara el jugador en el modo piloto automatico.
+                                El mejor camino siempre sera por el que reciba menos impactos, estos impactos esta contabilizados
+                                en der e izq.
+                                Por defecto, si hay el mismo numero de impactos a cada lado, se buscara el centro.
     @param izq: valor numerico de impactos si damos un paso a la izquierda.
     @param der: valor numerico de impactos si damos un paso a la derecha.
     @param pos: posicion del jugador en el escenario.
     @param numFilas: numero de filas.
     @param numColumnas: numero de columnas.
     */
+    // a continuacion devolveremos 1 para ir a la izquierda y 2 para ir a la derecha
     if (izq == der){
       // buscamos el centro
       if(numFilas*numColumnas-numColumnas/2-1<pos){
@@ -578,6 +624,7 @@ object Main {
         return 2
       }
     }
+
     else if( izq < der){
       if(pos-1 < numFilas*numColumnas-numColumnas){
         //fuera de linea
@@ -603,6 +650,8 @@ object Main {
     @param col: numero de columnas.
     */
     val nuevaMatriz = metodos.InicializarLista(fila * col)
+    // recorremos el escenario recursivamente descendiendo las naves.
+    // al ser una simulacion basica, no se aplican efectos colaterales ni reconversiones.
     def recorrerMatriz(posicion :Int, m :List[Int]):List[Int] = {
       if( posicion < fila*col-col){
         if(metodos.obtenerValorPosicion(posicion,matriz) != 2 ){
@@ -631,9 +680,11 @@ object Main {
     @param numColumnas: numero de columnas.
     */
     def movimiento(escenarioAux :List[Int], pos :Int, contador :Int):(Int,List[Int]) = {
+      // establecemos la profundidad de las soluciones (camino generado) en 5 ( profundidad del arbol)
       if ( contador < 5 && pos < numColumnas*numFilas && pos > numColumnas*numFilas-numColumnas-1){
         val valor = metodos.obtenerValorPosicion(pos, escenarioAux)
         val escenarioNuevo = descensoAuxiliar(escenarioAux, numFilas, numColumnas)
+        // funcion que devuelve 1 si el jugador se encuentra con cualquier elemento que no sea el vacio
         def impactado():Int = {
           if( valor != 0){
             return 1
@@ -641,11 +692,16 @@ object Main {
             return 0
           }
         }
+        // ramificacion hacia la izquierda
         val (izq, elec1) = movimiento(escenarioNuevo, pos-1, contador+1)
+        // ramificacion hacia la derecha
         val (der, elec2) = movimiento(escenarioNuevo, pos+1, contador+1)
+        // sumamos los impactos obtenidos a cada lado mas el de la posicion actual
         val izqAux = izq+impactado()
         val derAux = der+impactado()
+        // elegimos el mejor camino en base a los resultados de la ramificacion izquierda/derecha
         val eleccion = eleccionCamino(izqAux,derAux, pos, numFilas, numColumnas)
+        // dependiendo de la eleccion devolvemos el camino generado en la ramificacion derecha o el de izquierda
         def funcionAux():List[Int] = {
           if (eleccion <2){
             return elec1
@@ -653,6 +709,7 @@ object Main {
             return elec2
           }
         }
+
         def impactosAnteriores():Int = {
           if(eleccion <2){
             return izqAux
@@ -665,9 +722,10 @@ object Main {
         return (0,List())
       }
     }
+    // obtenemos el camino generado y nImpactos (variable residual usada para el numero de impactos en al recurscion)
     val (nImpactos, eleccion) = movimiento(escenario, posJugador,0 )
-    // el ultimo elemento de la lista es basura generada por la parada de recursion
     val elecciones = metodos.eliminarUltimo(eleccion)
+    // finalmente nos quedamos con el primer movimiento que debe hacer.
     def entradaFinal():Char = {
       if (elecciones.head == 1){
         return 'a'
@@ -675,9 +733,7 @@ object Main {
         return 'd'
       }
     }
-
     return entradaFinal()
-
   }
 
 
@@ -696,7 +752,7 @@ object Main {
 
     // Puntuación y vidas
     val puntuacion = 0
-    val vidas = 10
+    val vidas = 5
 
     // Generar muros y añadir usuario
     val escenarioInicial = generarMuros(escenarioVacio, numFilas, numColumnas, dimension)
