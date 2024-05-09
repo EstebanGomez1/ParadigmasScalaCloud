@@ -313,9 +313,12 @@ object Main {
     }
     // procedemos a descender las naves
     def descensoNaves(posicion: Int, matriz: List[Int], col: Int, fila: Int): List[Int] = {
+      //Caso base, comprueba que la posicion sea menor que la longitud
       if (matriz==Nil || posicion >= metodos.longitudLista(matriz,0)) {
         matriz
-      } else if (posicion < (fila * col) - col*2 && metodos.obtenerValorPosicion(posicion+col, matriz)!=2) {
+      }
+      //Caso posición menos las dos ultimas filas, sin que posicion+col sea muro
+      else if (posicion < (fila * col) - col*2 && metodos.obtenerValorPosicion(posicion+col, matriz)!=2) {
         val nuevoElemento = metodos.obtenerValorPosicion(posicion, matriz)
         if(nuevoElemento==2)
           metodos.insertarPosicion(nuevoElemento, posicion, descensoNaves(posicion + 1, matriz, col, fila))
@@ -328,12 +331,15 @@ object Main {
         else
           metodos.insertarPosicion(nuevoElemento, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
       }
+      //Comprueba que la posición de abajo sea el jugador par asignarle el valor de destrucción
       else if(posicion < (fila * col)-col && metodos.obtenerValorPosicion(posicion+col, matriz)==1) {
+        //Si posiciónn es 0 añade el jugador, si no, valor de destrucción
         if (metodos.obtenerValorPosicion(posicion, matriz) == 0) {
           metodos.insertarPosicion(1, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
         } else {
           metodos.insertarPosicion(-5, posicion + col, descensoNaves(posicion + 1, matriz, col, fila))
         }
+        //mientras que posición + col sea distinto del jugador, añadimos valores de destrucción de las naves o 0 si era 0 el valor de la posicion
       }else if(posicion < (fila * col)-col && metodos.obtenerValorPosicion(posicion+col, matriz)!=1){
         val nuevoElemento = elemento(metodos.obtenerValorPosicion(posicion, matriz))
         if(metodos.obtenerValorPosicion(posicion, matriz)==3 || metodos.obtenerValorPosicion(posicion, matriz)==4 || metodos.obtenerValorPosicion(posicion, matriz)==5)
